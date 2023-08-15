@@ -5,25 +5,6 @@
 using namespace geode::prelude;
 using namespace tulip::fps;
 
-class CCDirectorBypass : public CCDirector {
-public:
-	static CCDirectorBypass* get() {
-		return static_cast<CCDirectorBypass*>(CCDirector::sharedDirector());
-	}
-
-	bool ifPurge();
-};
-
-bool CCDirectorBypass::ifPurge() {
-	static bool purged = false;
-	if (m_bPurgeDirecotorInNextLoop && !purged) {
-		purged = true;
-		this->mainLoop();
-		m_bPurgeDirecotorInNextLoop = true;
-	}
-	return m_bPurgeDirecotorInNextLoop;
-}
-
 FPSBypass* FPSBypass::get() {
 	static FPSBypass s_ret;
 	return &s_ret;
@@ -74,9 +55,7 @@ void FPSBypass::updateLoop() {
 	[glContext makeCurrentContext];
 	CGLLockContext([glContext CGLContextObj]);
 
-	if (!CCDirectorBypass::get()->ifPurge()) {
-		CCDirector::sharedDirector()->getScheduler()->update(newDelta);
-	}
+	CCDirector::sharedDirector()->getScheduler()->update(newDelta);
 
 	CGLUnlockContext([glContext CGLContextObj]);
 
@@ -95,11 +74,9 @@ void FPSBypass::displayLoop(bool paused) {
 
 	[(id)[NSClassFromString(@"CCEventDispatcher") sharedDispatcher] dispatchQueuedEvents];
 
-	if (!CCDirectorBypass::get()->ifPurge()) {
-		cocos2d::CCDirector::sharedDirector()->setPaused(paused);
-		CCDirector::sharedDirector()->drawScene();
-		cocos2d::CCDirector::sharedDirector()->setPaused(false);
-	}
+	cocos2d::CCDirector::sharedDirector()->setPaused(paused);
+	CCDirector::sharedDirector()->drawScene();
+	cocos2d::CCDirector::sharedDirector()->setPaused(false);
 
 	// CCPoolManager::sharedPoolManager()->pop();
 

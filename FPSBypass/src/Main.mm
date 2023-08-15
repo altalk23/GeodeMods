@@ -16,6 +16,16 @@ void startMainLoop(CCDirectorCaller*, SEL) {
 	FPSBypass::get()->startMainLoop();
 }
 
+static IMP s_applicationShouldTerminate;
+
+NSApplicationTerminateReply applicationShouldTerminate(
+	void* controller, SEL sel, NSApplication* sender
+) {
+	using Type = decltype(&applicationShouldTerminate);
+	FPSBypass::get()->destroy();
+	return reinterpret_cast<Type>(s_applicationShouldTerminate)(controller, sel, sender);
+}
+
 using EventType = void (*)(id, SEL, NSEvent*);
 
 template <int Value>
@@ -37,6 +47,14 @@ void wrapOpenGLContext(id self, SEL sel, NSEvent* event) {
 template <class Type>
 IMP replaceMethod(Class metaclass, SEL selector, Type function) {
 	return class_replaceMethod(metaclass, selector, (IMP)function, @encode(Type));
+}
+
+void appControllerHooks() {
+	Class metaclass = (Class)((uintptr_t)objc_getMetaClass("AppController") - 0x28);
+
+	s_applicationShouldTerminate = replaceMethod(
+		metaclass, @selector(applicationShouldTerminate:), &applicationShouldTerminate
+	);
 }
 
 void directorCallerHooks() {
@@ -108,6 +126,7 @@ $on_mod(Enabled) {
 	CCDirectorCallerMake* caller = [NSClassFromString(@"CCDirectorCaller") sharedDirectorCaller];
 	[caller->renderTimer invalidate];
 
+	appControllerHooks();
 	directorCallerHooks();
 	eaglViewHooks();
 
