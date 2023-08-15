@@ -1,4 +1,4 @@
-project(FPSShower VERSION 1.0.0)
+project(FPSShower VERSION 1.0.1)
 
 file(GLOB SOURCES
 	src/*.cpp
