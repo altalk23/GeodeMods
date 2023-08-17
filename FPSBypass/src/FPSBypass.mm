@@ -78,7 +78,7 @@ void FPSBypass::displayLoop(bool paused) {
 	CCDirector::sharedDirector()->drawScene();
 	cocos2d::CCDirector::sharedDirector()->setPaused(false);
 
-	// CCPoolManager::sharedPoolManager()->pop();
+	CCPoolManager::sharedPoolManager()->pop();
 
 	[glContext flushBuffer];
 
