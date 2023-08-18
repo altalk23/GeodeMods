@@ -1,4 +1,6 @@
 
+#ifdef GEODE_IS_MACOS
+
 #include <Geode/modify/MusicDownloadManager.hpp>
 
 struct MusicResourcesPath : Modify<MusicResourcesPath, MusicDownloadManager> {
@@ -21,3 +23,5 @@ $execute {
 		ghc::filesystem::path(CCFileUtils::sharedFileUtils()->getWritablePath().c_str());
 	ghc::filesystem::create_directory(savePath / "Resources");
 }
+
+#endif
