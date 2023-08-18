@@ -38,7 +38,8 @@ void windowWillEnterFullScreen(id self, SEL selector, NSNotification* notificati
 	auto screenFrame = [[NSScreen mainScreen] frame];
 
 	CCEGLView::sharedOpenGLView()->setFrameSize(screenFrame.size.width, screenFrame.size.height);
-	CCDirector::get()->updateScreenScale({ screenFrame.size.width, screenFrame.size.height });
+	CCDirector::get()->updateScreenScale({ (float)screenFrame.size.width,
+										   (float)screenFrame.size.height });
 
 	[[NSClassFromString(@"EAGLView") sharedEGLView] setNeedsDisplay:YES];
 
@@ -49,7 +50,8 @@ void windowWillExitFullScreen(id self, SEL selector, NSNotification* notificatio
 	auto screenFrame = [[NSScreen mainScreen] frame];
 
 	CCEGLView::sharedOpenGLView()->setFrameSize(screenFrame.size.width, screenFrame.size.height);
-	CCDirector::get()->updateScreenScale({ screenFrame.size.width, screenFrame.size.height });
+	CCDirector::get()->updateScreenScale({ (float)screenFrame.size.width,
+										   (float)screenFrame.size.height });
 
 	[[NSClassFromString(@"EAGLView") sharedEGLView] setNeedsDisplay:YES];
 
