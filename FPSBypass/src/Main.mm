@@ -9,6 +9,7 @@ using namespace geode::prelude;
 using namespace tulip::fps;
 
 void setAnimationInterval(CCDirectorCaller*, SEL, double interval) {
+	log::debug("set animation interval {}", interval);
 	FPSBypass::get()->setAnimationInterval(interval);
 }
 
@@ -45,30 +46,34 @@ void wrapOpenGLContext(id self, SEL sel, NSEvent* event) {
 }
 
 template <class Type>
-IMP replaceMethod(Class metaclass, SEL selector, Type function) {
-	return class_replaceMethod(metaclass, selector, (IMP)function, @encode(Type));
+IMP replaceMethod(Class class_, SEL selector, Type function) {
+	return class_replaceMethod(class_, selector, (IMP)function, @encode(Type));
+}
+
+template <class Type>
+bool addMethod(Class class_, SEL selector, Type function) {
+	return class_addMethod(class_, selector, (IMP)function, @encode(Type));
 }
 
 void appControllerHooks() {
-	Class metaclass = (Class)((uintptr_t)objc_getMetaClass("AppController") - 0x28);
+	Class class_ = objc_getClass("AppController");
 
-	s_applicationShouldTerminate = replaceMethod(
-		metaclass, @selector(applicationShouldTerminate:), &applicationShouldTerminate
-	);
+	s_applicationShouldTerminate =
+		replaceMethod(class_, @selector(applicationShouldTerminate:), &applicationShouldTerminate);
 }
 
 void directorCallerHooks() {
-	Class metaclass = (Class)((uintptr_t)objc_getMetaClass("CCDirectorCaller") - 0x28);
+	Class class_ = objc_getClass("CCDirectorCaller");
 
-	replaceMethod(metaclass, @selector(setAnimationInterval:), &setAnimationInterval);
-	replaceMethod(metaclass, @selector(startMainLoop), &startMainLoop);
+	replaceMethod(class_, @selector(setAnimationInterval:), &setAnimationInterval);
+	replaceMethod(class_, @selector(startMainLoop), &startMainLoop);
 }
 
 void eaglViewHooks() {
-	Class metaclass = (Class)((uintptr_t)objc_getMetaClass("EAGLView") - 0x28);
+	Class class_ = objc_getClass("EAGLView");
 
 #define EAGL_HOOK(Id_, Sel_) \
-	s_eventImplementation<Id_> = replaceMethod(metaclass, @selector(Sel_), &wrapOpenGLContext<Id_>);
+	s_eventImplementation<Id_> = replaceMethod(class_, @selector(Sel_), &wrapOpenGLContext<Id_>);
 
 	// Mouse
 	EAGL_HOOK(0, mouseDown:);

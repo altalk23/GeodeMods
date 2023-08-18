@@ -17,12 +17,16 @@ struct ToggleFullscreenReplace : Modify<ToggleFullscreenReplace, PlatformToolbox
 	}
 };
 
-void applicationDidFinishLaunching(id self, SEL sel, NSNotification* notification) {
+static IMP s_applicationDidFinishLaunching;
+
+void applicationDidFinishLaunching(id self, SEL selector, NSNotification* notification) {
+	log::debug("dfgsjkhjgdfshjgksjdfkgjhskjdgf");
 	auto windowed = GameManager::get()->getGameVariable("0025");
 	if (!windowed) {
 		GameManager::get()->setGameVariable("0025", true);
 	}
-	[(id)self applicationDidFinishLaunching:notification];
+	using Type = decltype(&applicationDidFinishLaunching);
+	reinterpret_cast<Type>(s_applicationDidFinishLaunching)(self, selector, notification);
 
 	auto window = *(NSWindow**)((uintptr_t)self + 0x8);
 
@@ -58,23 +62,49 @@ void windowWillExitFullScreen(id self, SEL selector, NSNotification* notificatio
 	GameManager::get()->setGameVariable("0025", true);
 }
 
+void applicationWillBecomeActive(id self, SEL selector, NSNotification* notification) {
+	auto windowed = GameManager::get()->getGameVariable("0025");
+	if (windowed) {
+		AppDelegate::get()->applicationWillEnterForeground();
+	}
+	else {
+		AppDelegate::get()->applicationWillBecomeActive();
+	}
+}
+
+void applicationWillResignActive(id self, SEL selector, NSNotification* notification) {
+	auto windowed = GameManager::get()->getGameVariable("0025");
+	if (windowed) {
+		AppDelegate::get()->applicationDidEnterBackground();
+	}
+	else {
+		AppDelegate::get()->applicationWillResignActive();
+	}
+}
+
+template <class Type>
+IMP replaceMethod(Class class_, SEL selector, Type function) {
+	return class_replaceMethod(class_, selector, (IMP)function, @encode(Type));
+}
+
+template <class Type>
+bool addMethod(Class class_, SEL selector, Type function) {
+	return class_addMethod(class_, selector, (IMP)function, @encode(Type));
+}
+
+void appControllerHooks() {
+	Class class_ = objc_getClass("AppController");
+
+	addMethod(class_, @selector(windowWillEnterFullScreen:), &windowWillEnterFullScreen);
+	addMethod(class_, @selector(windowWillExitFullScreen:), &windowWillExitFullScreen);
+
+	s_applicationDidFinishLaunching = replaceMethod(
+		class_, @selector(applicationDidFinishLaunching:), &applicationDidFinishLaunching
+	);
+	replaceMethod(class_, @selector(applicationWillBecomeActive:), &applicationWillBecomeActive);
+	replaceMethod(class_, @selector(applicationWillResignActive:), &applicationWillResignActive);
+}
+
 $execute {
-	(void)Mod::get()->addHook(Hook::create(
-		Mod::get(), (void*)(base::get() + 0x69a0), &applicationDidFinishLaunching,
-		"AppController::applicationDidFinishLaunching:", tulip::hook::TulipConvention::Default
-	));
-
-	Class metaclass = (Class)((uintptr_t)objc_getMetaClass("AppController") - 0x28);
-
-	auto res = class_addMethod(
-		metaclass, @selector(windowWillEnterFullScreen:), (IMP)&windowWillEnterFullScreen,
-		"v24@0:8@16"
-	);
-	log::debug("Create AppController::windowWillEnterFullScreen:");
-
-	res = class_addMethod(
-		metaclass, @selector(windowWillExitFullScreen:), (IMP)&windowWillExitFullScreen,
-		"v24@0:8@16"
-	);
-	log::debug("Create AppController::windowWillExitFullScreen:");
+	appControllerHooks();
 }

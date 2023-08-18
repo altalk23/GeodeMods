@@ -11,6 +11,8 @@ struct MotionStreakCutoff : Modify<MotionStreakCutoff, CCMotionStreak> {
 
 		auto interval = CCDirector::sharedDirector()->getAnimationInterval();
 
+		log::debug("interval {}", interval);
+
 		m_uMaxPoints = (int)(fade / interval) + 2;
 		m_uNuPoints = 0;
 		free(m_pPointState);

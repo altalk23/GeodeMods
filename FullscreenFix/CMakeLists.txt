@@ -1,4 +1,4 @@
-project(FullscreenFix VERSION 1.0.1)
+project(FullscreenFix VERSION 1.0.2)
 
 file(GLOB OBJC_SOURCES
 	src/*.mm
