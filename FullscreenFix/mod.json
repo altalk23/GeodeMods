@@ -6,5 +6,8 @@
 	"developer": "alk",
 	"description": "Rewrites the fullscreen implementation on MacOS.",
 	"dependencies": [],
+	"api": {
+		"include": []
+	},
 	"early-load": true
 }

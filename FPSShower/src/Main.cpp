@@ -18,6 +18,8 @@ struct LoadingLayerCheck : Modify<LoadingLayerCheck, LoadingLayer> {
 	}
 };
 
+static bool s_loaded = false;
+
 #include <Geode/modify/MenuLayer.hpp>
 
 struct MenuLayerCheck : Modify<MenuLayerCheck, MenuLayer> {
@@ -25,6 +27,7 @@ struct MenuLayerCheck : Modify<MenuLayerCheck, MenuLayer> {
 		if (!MenuLayer::init()) {
 			return false;
 		}
+		s_loaded = true;
 		FPSUpdate::get()->setOverlay(FPSOverlay::create());
 		return true;
 	}
@@ -34,14 +37,18 @@ $on_mod(Enabled) {
 	log::info("Enabled");
 	CCDirector::get()->getScheduler()->scheduleUpdateForTarget(FPSUpdate::get(), 0, false);
 
-	FPSUpdate::get()->setOverlay(FPSOverlay::create());
+	if (s_loaded) {
+		FPSUpdate::get()->setOverlay(FPSOverlay::create());
+	}
 }
 
 $on_mod(Disabled) {
 	log::info("Disabled");
 	CCDirector::get()->getScheduler()->unscheduleUpdateForTarget(FPSUpdate::get());
 
-	FPSUpdate::get()->releaseOverlay();
+	if (s_loaded) {
+		FPSUpdate::get()->releaseOverlay();
+	}
 }
 
 static auto colorChanges = listenForSettingChanges(

@@ -37,26 +37,35 @@
 					"name": "FPSShower_PACKAGE",
 				},
 				{
-					"build_target": "GeodeCodegenSources",
+					"build_target": "FullscreenFix",
+					"name": "FullscreenFix",
+				},
+				{
+					"build_target": "FullscreenFix_PACKAGE",
+					"name": "FullscreenFix_PACKAGE",
+				},
+				{
+					/*"build_target": "cstool",*/
 					"name": "GeodeCodegenSources",
+					/*"target": "ctest_run",*/
+					"build_target": "GeodeCodegenSources",
 				},
 				{
 					"build_target": "GeodeFilesystemImpl",
 					"name": "GeodeFilesystemImpl",
 				},
 				{
-					/*"build_target": "cstool",*/
-					"name": "SmallAdditions",
-					/*"target": "ctest_run",*/
 					"build_target": "SmallAdditions",
+					"name": "SmallAdditions",
 				},
 				{
 					"build_target": "SmallAdditions_PACKAGE",
-					"name": "SmallAdditions_PACKAGE"
+					"name": "SmallAdditions_PACKAGE",
 				},
 				{
+					"name": "fmt",
+					/*"target": "ctest_run"*/
 					"build_target": "fmt",
-					"name": "fmt"
 				},
 				{
 					"build_target": "mat-json",

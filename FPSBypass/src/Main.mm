@@ -9,7 +9,6 @@ using namespace geode::prelude;
 using namespace tulip::fps;
 
 void setAnimationInterval(CCDirectorCaller*, SEL, double interval) {
-	log::debug("set animation interval {}", interval);
 	FPSBypass::get()->setAnimationInterval(interval);
 }
 
@@ -134,6 +133,4 @@ $on_mod(Enabled) {
 	appControllerHooks();
 	directorCallerHooks();
 	eaglViewHooks();
-
-	FPSBypass::get()->startMainLoop();
 }

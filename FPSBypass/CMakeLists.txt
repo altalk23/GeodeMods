@@ -1,4 +1,4 @@
-project(FPSBypass VERSION 1.0.5)
+project(FPSBypass VERSION 1.0.6)
 
 file(GLOB OBJC_SOURCES
 	src/*.mm
@@ -6,6 +6,8 @@ file(GLOB OBJC_SOURCES
 set_source_files_properties(${OBJC_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 add_library(${PROJECT_NAME} SHARED ${OBJC_SOURCES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 target_link_libraries(${PROJECT_NAME} "-framework Cocoa" "-framework OpenGL" "-framework CoreVideo")
 
