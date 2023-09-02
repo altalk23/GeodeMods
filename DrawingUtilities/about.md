@@ -1,3 +1,5 @@
-# Template Mod
+# Drawing Utilities
 
-Edit about.md to change this
+Right now only includes drawing lines, but bezier curves and space filling are planned.
+
+Also UI to be implemented.
