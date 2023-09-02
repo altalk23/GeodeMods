@@ -77,9 +77,9 @@ void LineGenerator::addUnits(std::vector<ObjectData>& objects, float units, floa
 	};
 
 	static std::array<Value, 7> things = {
-		Value { 1, 30, { 0, 0 }, 211 },    Value { 1.5, 10, { 0, 0 }, 580 },
-		Value { 3, 10, { 0, 0 }, 579 },    Value { 4, 7.5, { 0, 9 }, 1191 },
-		Value { 10, 1.5, { 0, 17 }, 508 }, Value { 20, 1.5, { 0, 17 }, 507 },
+		Value { 1, 30, { 0, 0 }, 211 },      Value { 1.5, 10, { 0, 0 }, 580 },
+		Value { 3, 10, { 0, 0 }, 579 },      Value { 4, 7.5, { 0, 11.25 }, 1191 },
+		Value { 10, 1.5, { 0, 4.25 }, 508 }, Value { 20, 1.5, { 0, 4.25 }, 507 },
 		Value { 30, 1, { 0, 0 }, 1753 }
 	};
 
@@ -98,7 +98,8 @@ void LineGenerator::addUnits(std::vector<ObjectData>& objects, float units, floa
 	int count = std::ceil(units / selected->size);
 
 	for (int i = 0; i < count; ++i) {
-		auto pos = CCPointMake(width * (i + 0.5) * selected->size, 0) - selected->offset;
+		auto scale = width / selected->scale;
+		auto pos = CCPointMake(width * (i + 0.5) * selected->size, 0) - selected->offset * scale;
 		auto obj = ObjectData { pos, width / selected->scale, 0, selected->id };
 		objects.push_back(obj);
 	}
