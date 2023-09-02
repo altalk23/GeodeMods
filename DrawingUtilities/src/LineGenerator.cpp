@@ -76,11 +76,11 @@ void LineGenerator::addUnits(std::vector<ObjectData>& objects, float units, floa
 		int id;
 	};
 
-	static std::array<Value, 7> things = {
+	static std::array<Value, 8> things = {
 		Value { 1, 30, { 0, 0 }, 211 },      Value { 1.5, 10, { 0, 0 }, 580 },
 		Value { 3, 10, { 0, 0 }, 579 },      Value { 4, 7.5, { 0, 11.25 }, 1191 },
-		Value { 10, 1.5, { 0, 4.25 }, 508 }, Value { 20, 1.5, { 0, 4.25 }, 507 },
-		Value { 30, 1, { 0, 0 }, 1753 }
+		Value { 10, 1.5, { 0, 4.25 }, 508 }, Value { 15, 1, { 0, 0 }, 1757 },
+		Value { 20, 1.5, { 0, 4.25 }, 507 }, Value { 30, 1, { 0, 0 }, 1753 }
 	};
 
 	auto selected = std::upper_bound(
