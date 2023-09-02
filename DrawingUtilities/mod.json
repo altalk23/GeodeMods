@@ -1,0 +1,8 @@
+{
+	"geode": "1.2.0",
+	"version": "1.0.0",
+	"id": "alk.drawing-utilities",
+	"name": "Drawing Utilities",
+	"developer": "alk",
+	"description": "Some editor drawing utilities"
+}

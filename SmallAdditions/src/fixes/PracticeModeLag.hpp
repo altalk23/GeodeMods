@@ -33,90 +33,23 @@ struct PracticeModeLag : Modify<PracticeModeLag, PlayLayer> {
 	}
 };
 
-// #include <Geode/modify/PlayerObject.hpp>
+// #include <Geode/modify/CCFileUtils.hpp>
 
-// struct MAT : Modify<MAT, PlayerObject> {
-// 	float f_lastPos = 0.0f;
+// struct File : Modify<File, cocos2d::CCFileUtils> {
+// 	virtual gd::string fullPathForFilename(char const* filename, bool unk) {
+// 		log::debug("looking for {}", filename);
 
-// 	void update(float dt) {
-// 		if (!PlayLayer::get()) {
-// 			return PlayerObject::update(dt);
-// 		}
-// 		// log::debug("update!!!");
-// 		auto player1 = PlayLayer::get()->m_player1;
+// 		auto ret = CCFileUtils::fullPathForFilename(filename, unk);
 
-// 		if (this == player1 && m_fields->f_lastPos != this->getPosition().x) {
-// 			log::debug("difference is {}", this->getPosition().x - m_fields->f_lastPos);
-// 		}
+// 		auto val = m_fullPathCache.std();
 
-// 		PlayerObject::update(dt);
-
-// 		if (this == player1) {
-// 			m_fields->f_lastPos = this->getPosition().x;
-// 		}
-// 	}
-// };
-
-// #include <Geode/modify/PlayerObject.hpp>
-
-// struct TestPlayObj : Modify<TestPlayObj, PlayerObject> {
-// 	void checkSnapJumpToObject(GameObject* obj) {
-// 		if (m_lastCollidedSolid) {
-// 			log::debug(
-// 				"last collided: {}, colliding: {}", m_lastCollidedSolid->m_uniqueID, obj->m_uniqueID
-// 			);
-// 			log::debug(
-// 				"checkSnapJumpToObject before - {} {} {}", this->getPosition(), obj->getPosition(),
-// 				m_lastCollidedSolid->getPosition()
-// 			);
-
-// 			auto x680 = cast::union_cast<double(PlayerObject::*)>((void*)0x680);
-
-// 			// log::debug("checking {}", this->*x680);
-
-// 			auto objPos1 = obj->getPosition();
-// 			auto objPos2 = m_lastCollidedSolid->getPosition();
-
-// 			log::debug(
-// 				"boob: {}, {}", std::fabs(objPos1.x - objPos2.x + -120.00), this->getPosition().x
-// 			);
-// 			log::debug("also this: {}, {}", objPos1.x, objPos2.x);
-// 			log::debug("mem680 value {}", this->*x680);
-
-// 			if ((std::fabs(objPos1.x - objPos2.x + -150.00) <= 1.0 &&
-// 				 std::fabs(objPos1.y - objPos2.y + -30.00) <= 1.0) ||
-// 				(std::fabs(objPos1.x - objPos2.x + -195.0) <= 1.0 &&
-// 				 std::fabs(objPos1.y - objPos2.y + +30.00) <= 1.0) ||
-// 				(std::fabs(objPos1.x - objPos2.x + -120.00) <= 1.0 &&
-// 				 std::fabs(objPos1.y - objPos2.y + -60.00) <= 1.0)) {
-// 				log::debug("eligible!!!");
-// 			}
+// 		log::debug("in cache: {}, {}", val.begin()->first, val.begin()->second);
+// 		for (auto it = val.begin(); it != val.end(); ++it) {
+// 			log::debug("in cache: {}, {}", it->first, it->second);
 // 		}
 
-// 		auto pos = this->getPosition();
+// 		log::debug("cache size {}", val.size());
 
-// 		// if ((std::fabs(objPos1.x - (90.0 + plaPos1.x)) <= 1.0 &&
-// 		// 	 std::fabs(objPos1.y - plaPos1.y + (this->m_isUpsideDown ? 30.0 : -30.0) <= 1.0)) ||
-// 		// 	(std::fabs(objPos1.x - (120.0 + plaPos1.x)) <= 1.0 &&
-// 		// 	 std::fabs(objPos1.y - plaPos1.y + (this->m_isUpsideDown ? -30.0 : 30.0) <= 1.0)) ||
-// 		// 	(std::fabs(objPos1.x - (60.0 + plaPos1.x)) <= 1.0 &&
-// 		// 	 std::fabs(objPos1.y - plaPos1.y + (this->m_isUpsideDown ? 60.0 : -60.0) <= 1.0))) {
-// 		// 	log::debug("eligible!!!");
-// 		// }
-
-// 		PlayerObject::checkSnapJumpToObject(obj);
-
-// 		auto pos2 = this->getPosition();
-
-// 		if (pos2.x != pos.x) {
-// 			log::debug("happeed!! {} to {}", pos.x, pos2.x);
-// 		}
-// 		// log::debug(
-// 		// 	"checkSnapJumpToObject fater - {} {} diff {}",
-// 		// 	PlayLayer::get()->m_player1->getPosition(), obj->getPosition(),
-// 		// 	PlayLayer::get()->m_player1->getPosition().x - obj->getPosition().x
-// 		// );
-
-// 		// this->setPosition(CCPointMake(pos.x, this->getPosition().y));
+// 		return ret;
 // 	}
 // };

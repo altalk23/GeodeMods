@@ -133,8 +133,8 @@ void appControllerHooks() {
 		"AppController::applicationDidFinishLaunching:", tulip::hook::TulipConvention::Default
 	));
 
-	replaceMethod(class_, @selector(applicationWillBecomeActive:), &applicationWillBecomeActive);
-	replaceMethod(class_, @selector(applicationWillResignActive:), &applicationWillResignActive);
+	// replaceMethod(class_, @selector(applicationWillBecomeActive:), &applicationWillBecomeActive);
+	// replaceMethod(class_, @selector(applicationWillResignActive:), &applicationWillResignActive);
 }
 
 $execute {
