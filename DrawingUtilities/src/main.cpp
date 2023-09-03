@@ -33,8 +33,7 @@ struct LineButton : Modify<LineButton, EditorUI> {
 
 		if (m_fields->abPopulated) {
 			auto generated = FillBezierLineGenerator().generate(
-				m_fields->lastBegin, m_fields->lastEnd + CCPointMake(0.01, 0.01),
-				m_fields->end + CCPointMake(0.01, 0.01), m_fields->begin,
+				m_fields->lastBegin, m_fields->lastEnd, m_fields->end, m_fields->begin,
 				{ 4, m_fields->abCount > 1 }
 			);
 

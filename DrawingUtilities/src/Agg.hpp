@@ -79,6 +79,11 @@ namespace agg {
 				return;
 			}
 
+			// edge case
+			if (x1 == x2 && y1 == y2 && x3 == x4 && y3 == y4) {
+				return;
+			}
+
 			// Calculate all the mid-points of the line segments
 			//----------------------
 			double x12 = (x1 + x2) / 2;
