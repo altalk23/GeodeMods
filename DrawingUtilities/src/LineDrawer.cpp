@@ -14,8 +14,7 @@ void LineDrawer::clearObjects() {
 bool LineDrawer::shouldDraw() {
 	using enum UsedGenerator;
 	switch (m_used) {
-		case Bezier:
-		case FillBezier: return m_dragCount > 0;
+		case Bezier: return m_dragCount > 0;
 		default: return true;
 	}
 }
@@ -23,8 +22,7 @@ bool LineDrawer::shouldDraw() {
 bool LineDrawer::isContinuing() {
 	using enum UsedGenerator;
 	switch (m_used) {
-		case Bezier:
-		case FillBezier: return m_dragCount > 0;
+		case Bezier: return m_dragCount > 0;
 		default: return false;
 	}
 }
@@ -32,8 +30,7 @@ bool LineDrawer::isContinuing() {
 void LineDrawer::setLastPoints() {
 	using enum UsedGenerator;
 	switch (m_used) {
-		case Bezier:
-		case FillBezier: {
+		case Bezier: {
 			m_lastBegin = m_begin;
 			m_lastEnd = m_end;
 			if (this->isContinuing()) {
@@ -66,11 +63,6 @@ std::vector<ObjectData> LineDrawer::generate() {
 			points = { m_lastBegin, m_lastEnd, m_end, m_begin };
 		} break;
 
-		case FillBezier: {
-			generator = std::make_unique<FillBezierLineGenerator>();
-			points = { m_lastBegin, m_lastEnd, m_end, m_begin };
-		} break;
-
 		default: return {};
 	}
 
@@ -85,15 +77,14 @@ void LineDrawer::drawOverlay() {
 		case Line:
 		case RoundedLine: break;
 
-		case Bezier:
-		case FillBezier: {
+		case Bezier: {
 			m_drawLayer->drawDot(m_begin, 7, { 1, 0.5, 1, 1 });
 			m_drawLayer->drawDot(m_end, 5, { 0.5, 1, 1, 1 });
 			m_drawLayer->drawSegment(m_begin, m_end, 1, { 0.5, 1, 1, 1 });
 			if (this->isContinuing()) {
 				auto control = m_begin - (m_end - m_begin);
-				m_drawLayer->drawDot(control, 5, { 0.5, 1, 1, 1 });
-				m_drawLayer->drawSegment(m_begin, control, 1, { 0.5, 1, 1, 1 });
+				m_drawLayer->drawDot(control, 5, { 1, 1, 0.5, 1 });
+				m_drawLayer->drawSegment(m_begin, control, 1, { 1, 1, 0.5, 1 });
 
 				m_drawLayer->drawDot(m_lastBegin, 7, { 1, 0.5, 1, 1 });
 				m_drawLayer->drawDot(m_lastEnd, 5, { 0.5, 1, 1, 1 });

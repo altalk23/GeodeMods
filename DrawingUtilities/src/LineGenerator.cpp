@@ -149,22 +149,6 @@ std::vector<ObjectData> RoundedLineGenerator::generate(
 	return ret;
 }
 
-std::vector<ObjectData> BezierLineGenerator::generate(
-	std::vector<cocos2d::CCPoint> const& points, LineData const& data
-) {
-	auto generator = agg::curve4_div(points[0], points[1], points[2], points[3]);
-
-	auto ret = std::vector<ObjectData>();
-
-	for (size_t i = 0; i < generator.m_points.size() - 1; ++i) {
-		auto add =
-			LineGenerator().generate({ generator.m_points[i], generator.m_points[i + 1] }, data);
-		ret.insert(ret.end(), add.begin(), add.end());
-	}
-
-	return ret;
-}
-
 // time for some hardcore math
 // what did i do to deserve this
 namespace {
@@ -225,7 +209,7 @@ namespace {
 	};
 }
 
-std::vector<ObjectData> FillBezierLineGenerator::generate(
+std::vector<ObjectData> BezierLineGenerator::generate(
 	std::vector<cocos2d::CCPoint> const& points, LineData const& data
 ) {
 	auto generator = agg::curve4_div(points[0], points[1], points[2], points[3]);

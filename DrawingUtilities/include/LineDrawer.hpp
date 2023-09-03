@@ -9,7 +9,6 @@ namespace tulip::editor {
 		Line,
 		RoundedLine,
 		Bezier,
-		FillBezier
 	};
 
 	class LineDrawer {
@@ -19,7 +18,7 @@ namespace tulip::editor {
 		geode::Ref<cocos2d::CCLayer> m_lineLayer;
 		geode::Ref<cocos2d::CCDrawNode> m_drawLayer;
 
-		UsedGenerator m_used = UsedGenerator::FillBezier;
+		UsedGenerator m_used;
 		float m_thickness = 6;
 
 		cocos2d::CCPoint m_lastBegin;

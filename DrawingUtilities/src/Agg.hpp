@@ -54,7 +54,7 @@ namespace agg {
 		curve4_div(
 			cocos2d::CCPoint p1, cocos2d::CCPoint p2, cocos2d::CCPoint p3, cocos2d::CCPoint p4
 		) :
-			m_approximation_scale(0.05),
+			m_approximation_scale(0.1),
 			m_angle_tolerance(0.0),
 			m_cusp_limit(0.0),
 			m_count(0) {

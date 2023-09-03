@@ -46,10 +46,4 @@ namespace tulip::editor {
 		) override;
 	};
 
-	class FillBezierLineGenerator : public BezierLineGenerator {
-	public:
-		std::vector<ObjectData> generate(
-			std::vector<cocos2d::CCPoint> const& points, LineData const& data
-		) override;
-	};
 }

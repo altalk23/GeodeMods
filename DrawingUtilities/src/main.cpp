@@ -10,6 +10,8 @@ using namespace tulip::editor;
 struct LineButton : Modify<LineButton, EditorUI> {
 	bool lineEnabled = false;
 	LineDrawer drawer;
+	int state = 0;
+	CCMenuItemSpriteExtra* button;
 
 	CCPoint getPos(CCTouch* touch) {
 		return m_editorLayer->m_objectLayer->convertToNodeSpace(
@@ -39,9 +41,38 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		m_fields->drawer.ended(this->getPos(touch));
 	}
 
+	void updateButtonState() {
+		struct Value {
+			std::string text;
+			EditorBaseColor color;
+		};
+
+		std::array<Value, 5> thing = { Value { "Line\nDisabled", EditorBaseColor::Gray },
+									   Value { "Line", EditorBaseColor::Pink },
+									   Value { "Rounded\nLine", EditorBaseColor::Green },
+									   Value { "Bezier", EditorBaseColor::Aqua } };
+
+		auto state = m_fields->state;
+		auto lineText = CCLabelBMFont::create(thing[state].text.c_str(), "bigFont.fnt");
+		lineText->setAlignment(kCCTextAlignmentCenter);
+		auto buttonSprite = EditorButtonSprite::create(lineText, thing[state].color);
+
+		m_fields->button->setNormalImage(buttonSprite);
+		m_fields->button->setSelectedImage(buttonSprite);
+	}
+
 	void onLineButton(CCObject* sender) {
-		m_fields->lineEnabled = !m_fields->lineEnabled;
+		m_fields->lineEnabled = true;
 		m_fields->drawer.reset();
+		m_fields->state++;
+		if (m_fields->state == 4) {
+			m_fields->state = 0;
+			m_fields->lineEnabled = false;
+		}
+		else {
+			m_fields->drawer.m_used = static_cast<UsedGenerator>(m_fields->state - 1);
+		}
+		this->updateButtonState();
 	}
 
 	bool init(LevelEditorLayer* editorLayer) {
@@ -56,13 +87,14 @@ struct LineButton : Modify<LineButton, EditorUI> {
 			return true;
 		}
 
-		auto lineText = CCLabelBMFont::create("Line", "bigFont.fnt");
-
-		auto buttonSprite = EditorButtonSprite::create(lineText, EditorBaseColor::Pink);
+		auto buttonSprite = EditorButtonSprite::create(nullptr, EditorBaseColor::Gray);
 
 		auto button = CCMenuItemSpriteExtra::create(
 			buttonSprite, this, menu_selector(LineButton::onLineButton)
 		);
+		m_fields->button = button;
+		this->updateButtonState();
+
 		button->setSizeMult(1.2);
 		button->setContentSize({ 40.0f, 40.0f });
 
