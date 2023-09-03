@@ -107,7 +107,11 @@ void LineGenerator::addUnits(std::vector<ObjectData>& objects, float units, floa
 		objects.push_back(obj);
 	}
 
-	objects.back().position.x = units * width - width * selected->size * 0.5;
+	if (objects.size() > 0) {
+		// this should never be 0 in normal circumstances but when two points are on top of each
+		// other they are so
+		objects.back().position.x = units * width - width * selected->size * 0.5;
+	}
 }
 
 void LineGenerator::rotate(std::vector<ObjectData>& objects, float rotation) {
