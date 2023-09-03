@@ -226,6 +226,10 @@ std::vector<ObjectData> FillBezierLineGenerator::generate(
 	auto ret = std::vector<ObjectData>();
 	auto width = data.thickness;
 
+	if (data.continuation && generator.m_points.size() > 0) {
+		ret.push_back({ generator.m_points[0], data.thickness / 9, 0, 725 });
+	}
+
 	for (size_t i = 0; i < generator.m_points.size() - 1; ++i) {
 		auto begin = generator.m_points[i];
 		auto end = generator.m_points[i + 1];
@@ -235,11 +239,10 @@ std::vector<ObjectData> FillBezierLineGenerator::generate(
 			auto a2 = generator.m_points[i];
 			auto a3 = generator.m_points[i + 1];
 
-			auto extend = BezierFill::extend(a1, a2, a3, width).first;
-
-			if (extend.getDistance(begin) < width / 2) {
-				begin = extend;
+			if (std::abs(BezierFill::angle(a1, a2, a3)) >= std::numbers::pi * 0.75) {
+				begin = BezierFill::extend(a1, a2, a3, width).first;
 			}
+			else {}
 		}
 
 		if (i < generator.m_points.size() - 2) {
@@ -247,10 +250,8 @@ std::vector<ObjectData> FillBezierLineGenerator::generate(
 			auto a3 = generator.m_points[i + 1];
 			auto a4 = generator.m_points[i + 2];
 
-			auto extend = end = BezierFill::extend(a2, a3, a4, width).second;
-
-			if (extend.getDistance(begin) < width / 2) {
-				end = extend;
+			if (std::abs(BezierFill::angle(a2, a3, a4)) >= std::numbers::pi * 0.75) {
+				end = BezierFill::extend(a2, a3, a4, width).second;
 			}
 			else {
 				ret.push_back({ end, data.thickness / 9, 0, 725 });

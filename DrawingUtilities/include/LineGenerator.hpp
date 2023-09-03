@@ -3,6 +3,7 @@
 namespace tulip::editor {
 	struct LineData {
 		float thickness;
+		bool continuation = false;
 	};
 
 	struct ObjectData {

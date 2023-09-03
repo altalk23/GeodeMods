@@ -11,6 +11,7 @@ struct LineButton : Modify<LineButton, EditorUI> {
 	Ref<CCArray> lineObjects;
 	Ref<CCLayer> lineLayer;
 	bool abPopulated = false;
+	int abCount = 0;
 	CCPoint lastBegin;
 	CCPoint lastEnd;
 	CCPoint begin;
@@ -31,13 +32,10 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		this->clearObjects();
 
 		if (m_fields->abPopulated) {
-			log::debug(
-				"{}, {}, {}, {}", m_fields->lastBegin, m_fields->lastEnd, m_fields->end,
-				m_fields->begin
-			);
 			auto generated = FillBezierLineGenerator().generate(
 				m_fields->lastBegin, m_fields->lastEnd + CCPointMake(0.01, 0.01),
-				m_fields->end + CCPointMake(0.01, 0.01), m_fields->begin, { 6 }
+				m_fields->end + CCPointMake(0.01, 0.01), m_fields->begin,
+				{ 4, m_fields->abCount > 1 }
 			);
 
 			// auto generated = LineGenerator().generate(m_fields->begin, m_fields->end, { 15 });
@@ -113,10 +111,12 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		}
 
 		m_fields->abPopulated = true;
+		m_fields->abCount++;
 	}
 
 	void onLineButton(CCObject* sender) {
 		m_fields->abPopulated = false;
+		m_fields->abCount = 0;
 		m_fields->lineEnabled = !m_fields->lineEnabled;
 	}
 
