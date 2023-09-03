@@ -35,4 +35,12 @@ namespace tulip::editor {
 			cocos2d::CCPoint begin, cocos2d::CCPoint end, LineData const& data
 		) override;
 	};
+
+	class BezierLineGenerator {
+	public:
+		virtual std::vector<ObjectData> generate(
+			cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
+			LineData const& data
+		);
+	};
 }

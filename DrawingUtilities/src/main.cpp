@@ -10,6 +10,9 @@ struct LineButton : Modify<LineButton, EditorUI> {
 	bool lineEnabled = false;
 	Ref<CCArray> lineObjects;
 	Ref<CCLayer> lineLayer;
+	bool abPopulated = false;
+	CCPoint lastBegin;
+	CCPoint lastEnd;
 	CCPoint begin;
 	CCPoint end;
 
@@ -27,37 +30,43 @@ struct LineButton : Modify<LineButton, EditorUI> {
 	void generateLine() {
 		this->clearObjects();
 
-		auto generated = LineGenerator().generate(m_fields->begin, m_fields->end, { 6 });
+		if (m_fields->abPopulated) {
+			auto generated = BezierLineGenerator().generate(
+				m_fields->lastBegin, m_fields->lastEnd, m_fields->end, m_fields->begin, { 4 }
+			);
 
-		for (auto& data : generated) {
-			// log::debug("object {} {}", data.position, data.rotation);
-			auto obj = GameObject::createWithKey(data.id);
+			// auto generated = LineGenerator().generate(m_fields->begin, m_fields->end, { 15 });
 
-			obj->customSetup();
-			obj->addColorSprite();
-			obj->setupCustomSprites();
+			for (auto& data : generated) {
+				// log::debug("object {} {}", data.position, data.rotation);
+				auto obj = GameObject::createWithKey(data.id);
 
-			obj->setPosition(data.position);
-			obj->setStartPos(data.position);
-			m_fields->lineObjects->addObject(obj);
+				obj->customSetup();
+				obj->addColorSprite();
+				obj->setupCustomSprites();
 
-			obj->setRotation(data.rotation);
+				obj->setPosition(data.position);
+				obj->setStartPos(data.position);
+				m_fields->lineObjects->addObject(obj);
 
-			obj->m_scale = data.scale;
-			obj->setRScale(1.0f);
-			obj->m_isObjectRectDirty = true;
-			obj->m_textureRectDirty = true;
+				obj->setRotation(data.rotation);
 
-			if (obj->m_baseColor) {
-				obj->m_baseColor->m_colorID = 1011;
-				obj->m_shouldUpdateColorSprite = true;
+				obj->m_scale = data.scale;
+				obj->setRScale(1.0f);
+				obj->m_isObjectRectDirty = true;
+				obj->m_textureRectDirty = true;
+
+				if (obj->m_baseColor) {
+					obj->m_baseColor->m_colorID = 1011;
+					obj->m_shouldUpdateColorSprite = true;
+				}
+				if (obj->m_detailColor) {
+					obj->m_detailColor->m_colorID = 1011;
+					obj->m_shouldUpdateColorSprite = true;
+				}
+
+				m_fields->lineLayer->addChild(obj);
 			}
-			if (obj->m_detailColor) {
-				obj->m_detailColor->m_colorID = 1011;
-				obj->m_shouldUpdateColorSprite = true;
-			}
-
-			m_fields->lineLayer->addChild(obj);
 		}
 	}
 
@@ -89,9 +98,20 @@ struct LineButton : Modify<LineButton, EditorUI> {
 			m_editorLayer->addSpecial(obj);
 		}
 		this->clearObjects();
+
+		m_fields->lastBegin = m_fields->begin;
+		if (m_fields->abPopulated) {
+			m_fields->lastEnd = m_fields->begin - (m_fields->end - m_fields->begin);
+		}
+		else {
+			m_fields->lastEnd = m_fields->end;
+		}
+
+		m_fields->abPopulated = true;
 	}
 
 	void onLineButton(CCObject* sender) {
+		m_fields->abPopulated = false;
 		m_fields->lineEnabled = !m_fields->lineEnabled;
 	}
 

@@ -1,3 +1,5 @@
+#include "Agg.hpp"
+
 #include <LineGenerator.hpp>
 
 using namespace geode::prelude;
@@ -7,10 +9,6 @@ using namespace tulip::editor;
 
 float LineGenerator::getRotation(CCPoint const& begin, CCPoint const& end) {
 	auto rotation = -(end - begin).getAngle();
-
-	if (CCKeyboardDispatcher::get()->getShiftKeyPressed()) {
-		rotation = std::round(rotation / std::numbers::pi * 2) * std::numbers::pi / 2;
-	}
 
 	return rotation;
 }
@@ -54,8 +52,11 @@ std::vector<ObjectData> LineGenerator::generate(CCPoint begin, CCPoint end, Line
 	auto length = begin.getDistance(end);
 	auto width = data.thickness;
 	if (width > length) {
-		return ret;
 		std::swap(length, width);
+		auto mid = begin.lerp(end, 0.5);
+		auto out = CCPoint::forAngle((end - begin).getAngle() + std::numbers::pi / 2) * length / 2;
+		begin = mid + out;
+		end = mid - out;
 	}
 
 	auto units = length / width;
@@ -77,10 +78,12 @@ void LineGenerator::addUnits(std::vector<ObjectData>& objects, float units, floa
 	};
 
 	static std::array<Value, 8> things = {
-		Value { 1, 30, { 0, 0 }, 211 },      Value { 1.5, 10, { 0, 0 }, 580 },
-		Value { 3, 10, { 0, 0 }, 579 },      Value { 4, 7.5, { 0, 11.25 }, 1191 },
-		Value { 10, 1.5, { 0, 4.25 }, 508 }, Value { 15, 1, { 0, 0 }, 1757 },
-		Value { 20, 1.5, { 0, 4.25 }, 507 }, Value { 30, 1, { 0, 0 }, 1753 }
+		Value { 1, 30, { 0, 0 }, 211 }, Value { 1.5, 10, { 0, 0 }, 580 },
+		Value { 3, 10, { 0, 0 }, 579 }, Value { 4, 7.5, { 0, 11.25 }, 1191 },
+		Value { 10, 1.5, { 0, 4.25 }, 508 },
+		/*Value { 120.0 / 17.0, 17.0 / 4.0, { 0, 12.125 }, 1277 },*/
+		Value { 15, 1, { 0, 0 }, 1757 }, Value { 20, 1.5, { 0, 4.25 }, 507 },
+		Value { 30, 1, { 0, 0 }, 1753 }
 	};
 
 	auto selected = std::upper_bound(
@@ -130,6 +133,22 @@ std::vector<ObjectData> RoundedLineGenerator::generate(
 
 	ret.push_back({ begin, data.thickness / 9, 0, 725 });
 	ret.push_back({ end, data.thickness / 9, 0, 725 });
+
+	return ret;
+}
+
+std::vector<ObjectData> BezierLineGenerator::generate(
+	cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
+	LineData const& data
+) {
+	auto generator = agg::curve4_div(ap, bp, cp, dp);
+
+	auto ret = std::vector<ObjectData>();
+
+	for (size_t i = 0; i < generator.m_points.size() - 1; ++i) {
+		auto add = LineGenerator().generate(generator.m_points[i], generator.m_points[i + 1], data);
+		ret.insert(ret.end(), add.begin(), add.end());
+	}
 
 	return ret;
 }
