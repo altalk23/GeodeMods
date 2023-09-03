@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Geode/Loader.hpp>
 
 namespace tulip::editor {
@@ -26,30 +28,28 @@ namespace tulip::editor {
 		cocos2d::CCPoint getEndpoint(cocos2d::CCPoint const& begin, cocos2d::CCPoint const& end);
 
 		virtual std::vector<ObjectData> generate(
-			cocos2d::CCPoint begin, cocos2d::CCPoint end, LineData const& data
+			std::vector<cocos2d::CCPoint> const& points, LineData const& data
 		);
 	};
 
 	class RoundedLineGenerator : public LineGenerator {
 	public:
 		std::vector<ObjectData> generate(
-			cocos2d::CCPoint begin, cocos2d::CCPoint end, LineData const& data
+			std::vector<cocos2d::CCPoint> const& points, LineData const& data
 		) override;
 	};
 
-	class BezierLineGenerator {
+	class BezierLineGenerator : public LineGenerator {
 	public:
-		virtual std::vector<ObjectData> generate(
-			cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
-			LineData const& data
-		);
+		std::vector<ObjectData> generate(
+			std::vector<cocos2d::CCPoint> const& points, LineData const& data
+		) override;
 	};
 
 	class FillBezierLineGenerator : public BezierLineGenerator {
 	public:
 		std::vector<ObjectData> generate(
-			cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
-			LineData const& data
+			std::vector<cocos2d::CCPoint> const& points, LineData const& data
 		) override;
 	};
 }

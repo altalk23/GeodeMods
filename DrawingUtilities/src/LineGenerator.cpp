@@ -43,7 +43,12 @@ CCPoint LineGenerator::getEndpoint(CCPoint const& begin, CCPoint const& end) {
 	return endpoint;
 }
 
-std::vector<ObjectData> LineGenerator::generate(CCPoint begin, CCPoint end, LineData const& data) {
+std::vector<ObjectData> LineGenerator::generate(
+	std::vector<cocos2d::CCPoint> const& points, LineData const& data
+) {
+	auto begin = points[0];
+	auto end = points[1];
+
 	auto ret = std::vector<ObjectData>();
 
 	begin = this->getBeginpoint(begin, end);
@@ -128,9 +133,12 @@ void LineGenerator::move(std::vector<ObjectData>& objects, cocos2d::CCPoint cons
 }
 
 std::vector<ObjectData> RoundedLineGenerator::generate(
-	CCPoint begin, CCPoint end, LineData const& data
+	std::vector<cocos2d::CCPoint> const& points, LineData const& data
 ) {
-	auto ret = LineGenerator::generate(begin, end, data);
+	auto begin = points[0];
+	auto end = points[1];
+
+	auto ret = LineGenerator::generate(points, data);
 
 	begin = this->getBeginpoint(begin, end);
 	end = this->getEndpoint(begin, end);
@@ -142,15 +150,15 @@ std::vector<ObjectData> RoundedLineGenerator::generate(
 }
 
 std::vector<ObjectData> BezierLineGenerator::generate(
-	cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
-	LineData const& data
+	std::vector<cocos2d::CCPoint> const& points, LineData const& data
 ) {
-	auto generator = agg::curve4_div(ap, bp, cp, dp);
+	auto generator = agg::curve4_div(points[0], points[1], points[2], points[3]);
 
 	auto ret = std::vector<ObjectData>();
 
 	for (size_t i = 0; i < generator.m_points.size() - 1; ++i) {
-		auto add = LineGenerator().generate(generator.m_points[i], generator.m_points[i + 1], data);
+		auto add =
+			LineGenerator().generate({ generator.m_points[i], generator.m_points[i + 1] }, data);
 		ret.insert(ret.end(), add.begin(), add.end());
 	}
 
@@ -218,10 +226,9 @@ namespace {
 }
 
 std::vector<ObjectData> FillBezierLineGenerator::generate(
-	cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
-	LineData const& data
+	std::vector<cocos2d::CCPoint> const& points, LineData const& data
 ) {
-	auto generator = agg::curve4_div(ap, bp, cp, dp);
+	auto generator = agg::curve4_div(points[0], points[1], points[2], points[3]);
 
 	auto ret = std::vector<ObjectData>();
 	auto width = data.thickness;
@@ -258,7 +265,7 @@ std::vector<ObjectData> FillBezierLineGenerator::generate(
 			}
 		}
 
-		auto add = LineGenerator().generate(begin, end, data);
+		auto add = LineGenerator().generate({ begin, end }, data);
 		ret.insert(ret.end(), add.begin(), add.end());
 	}
 
