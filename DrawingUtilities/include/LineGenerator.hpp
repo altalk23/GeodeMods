@@ -44,15 +44,7 @@ namespace tulip::editor {
 		);
 	};
 
-	class RectangleFillBezierLineGenerator : public BezierLineGenerator {
-	public:
-		std::vector<ObjectData> generate(
-			cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
-			LineData const& data
-		) override;
-	};
-
-	class RoundedFillBezierLineGenerator : public BezierLineGenerator {
+	class FillBezierLineGenerator : public BezierLineGenerator {
 	public:
 		std::vector<ObjectData> generate(
 			cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,

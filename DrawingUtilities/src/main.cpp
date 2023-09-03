@@ -31,7 +31,7 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		this->clearObjects();
 
 		if (m_fields->abPopulated) {
-			auto generated = RoundedFillBezierLineGenerator().generate(
+			auto generated = FillBezierLineGenerator().generate(
 				m_fields->lastBegin, m_fields->lastEnd, m_fields->end, m_fields->begin, { 30 }
 			);
 
