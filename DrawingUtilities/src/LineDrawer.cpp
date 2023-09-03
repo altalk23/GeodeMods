@@ -172,6 +172,7 @@ void LineDrawer::ended(cocos2d::CCPoint pos) {
 
 void LineDrawer::reset() {
 	m_dragCount = 0;
+	m_drawLayer->clear();
 }
 
 LineDrawer::LineDrawer() {
