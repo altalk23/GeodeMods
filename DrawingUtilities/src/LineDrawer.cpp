@@ -24,7 +24,7 @@ bool LineDrawer::isContinuing() {
 	using enum UsedGenerator;
 	switch (m_used) {
 		case RoughBezier:
-		case Bezier: return m_dragCount > 0;
+		case Bezier: return m_dragCount > 1;
 		default: return false;
 	}
 }
@@ -69,7 +69,7 @@ std::vector<ObjectData> LineDrawer::generate() {
 		}
 		case Bezier: {
 			generator = std::make_unique<BezierLineGenerator>();
-			auto control = this->isContinuing() ? m_begin - (m_end - m_begin) : m_end;
+			auto control = this->shouldDraw() ? m_begin - (m_end - m_begin) : m_end;
 			points = { m_lastBegin, m_lastEnd, control, m_begin };
 		} break;
 
@@ -90,7 +90,7 @@ void LineDrawer::drawOverlay() {
 		case RoughBezier:
 		case Bezier: {
 			m_drawLayer->drawDot(m_begin, 7, { 1, 0.5, 1, 1 });
-			if (this->isContinuing()) {
+			if (this->shouldDraw()) {
 				auto control = m_begin - (m_end - m_begin);
 				m_drawLayer->drawDot(control, 5, { 0.5, 1, 1, 1 });
 				m_drawLayer->drawSegment(m_begin, control, 1, { 0.5, 1, 1, 1 });

@@ -2,15 +2,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 
 struct PracticeModeLag : Modify<PracticeModeLag, PlayLayer> {
-	int resetDelta;
-
-	bool init(GJGameLevel* level) {
-		m_fields->resetDelta = 0;
-		if (!PlayLayer::init(level)) {
-			return false;
-		}
-		return true;
-	}
+	int resetDelta = 0;
 
 	void update(float dt) override {
 		if (m_fields->resetDelta == 0) {

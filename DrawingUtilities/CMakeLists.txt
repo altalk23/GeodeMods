@@ -1,4 +1,4 @@
-project(DrawingUtilities VERSION 0.2.1)
+project(DrawingUtilities VERSION 0.2.2)
 
 file(GLOB SOURCES
 	src/*.cpp
