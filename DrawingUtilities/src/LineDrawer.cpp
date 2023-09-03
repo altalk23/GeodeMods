@@ -14,6 +14,7 @@ void LineDrawer::clearObjects() {
 bool LineDrawer::shouldDraw() {
 	using enum UsedGenerator;
 	switch (m_used) {
+		case RoughBezier:
 		case Bezier: return m_dragCount > 0;
 		default: return true;
 	}
@@ -22,6 +23,7 @@ bool LineDrawer::shouldDraw() {
 bool LineDrawer::isContinuing() {
 	using enum UsedGenerator;
 	switch (m_used) {
+		case RoughBezier:
 		case Bezier: return m_dragCount > 0;
 		default: return false;
 	}
@@ -30,6 +32,7 @@ bool LineDrawer::isContinuing() {
 void LineDrawer::setLastPoints() {
 	using enum UsedGenerator;
 	switch (m_used) {
+		case RoughBezier:
 		case Bezier: {
 			m_lastBegin = m_begin;
 			m_lastEnd = m_end;
@@ -47,6 +50,8 @@ std::vector<ObjectData> LineDrawer::generate() {
 	std::unique_ptr<LineGenerator> generator;
 	std::vector<CCPoint> points;
 
+	float bezierDetail = 0.1;
+
 	switch (m_used) {
 		case Line: {
 			generator = std::make_unique<LineGenerator>();
@@ -58,6 +63,10 @@ std::vector<ObjectData> LineDrawer::generate() {
 			points = { m_begin, m_end };
 		} break;
 
+		case RoughBezier: {
+			bezierDetail = 0.04;
+			[[fallthrough]];
+		}
 		case Bezier: {
 			generator = std::make_unique<BezierLineGenerator>();
 			auto control = this->isContinuing() ? m_begin - (m_end - m_begin) : m_end;
@@ -67,7 +76,7 @@ std::vector<ObjectData> LineDrawer::generate() {
 		default: return {};
 	}
 
-	return generator->generate(points, { m_thickness, this->isContinuing() });
+	return generator->generate(points, { m_thickness, this->isContinuing(), bezierDetail });
 }
 
 void LineDrawer::drawOverlay() {
@@ -78,6 +87,7 @@ void LineDrawer::drawOverlay() {
 		case Line:
 		case RoundedLine: break;
 
+		case RoughBezier:
 		case Bezier: {
 			m_drawLayer->drawDot(m_begin, 7, { 1, 0.5, 1, 1 });
 			if (this->isContinuing()) {

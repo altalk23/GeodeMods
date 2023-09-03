@@ -52,9 +52,10 @@ namespace agg {
 		std::vector<cocos2d::CCPoint> m_points;
 
 		curve4_div(
-			cocos2d::CCPoint p1, cocos2d::CCPoint p2, cocos2d::CCPoint p3, cocos2d::CCPoint p4
+			cocos2d::CCPoint p1, cocos2d::CCPoint p2, cocos2d::CCPoint p3, cocos2d::CCPoint p4,
+			float approximation_scale
 		) :
-			m_approximation_scale(0.1),
+			m_approximation_scale(approximation_scale),
 			m_angle_tolerance(0.0),
 			m_cusp_limit(0.0),
 			m_count(0) {

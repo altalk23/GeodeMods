@@ -9,6 +9,7 @@ namespace tulip::editor {
 		Line,
 		RoundedLine,
 		Bezier,
+		RoughBezier,
 	};
 
 	class LineDrawer {

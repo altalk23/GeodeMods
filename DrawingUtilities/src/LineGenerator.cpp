@@ -212,7 +212,7 @@ namespace {
 std::vector<ObjectData> BezierLineGenerator::generate(
 	std::vector<cocos2d::CCPoint> const& points, LineData const& data
 ) {
-	auto generator = agg::curve4_div(points[0], points[1], points[2], points[3]);
+	auto generator = agg::curve4_div(points[0], points[1], points[2], points[3], data.bezierDetail);
 
 	auto ret = std::vector<ObjectData>();
 	auto width = data.thickness;

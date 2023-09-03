@@ -50,7 +50,8 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		std::array<Value, 5> thing = { Value { "Line\nDisabled", EditorBaseColor::Gray },
 									   Value { "Line", EditorBaseColor::Pink },
 									   Value { "Rounded\nLine", EditorBaseColor::Green },
-									   Value { "Bezier", EditorBaseColor::Aqua } };
+									   Value { "Bezier", EditorBaseColor::Aqua },
+									   Value { "Rough\nBezier", EditorBaseColor::Cyan } };
 
 		auto state = m_fields->state;
 		auto lineText = CCLabelBMFont::create(thing[state].text.c_str(), "bigFont.fnt");
@@ -65,7 +66,7 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		m_fields->lineEnabled = true;
 		m_fields->drawer.reset();
 		m_fields->state++;
-		if (m_fields->state == 4) {
+		if (m_fields->state == 5) {
 			m_fields->state = 0;
 			m_fields->lineEnabled = false;
 		}
