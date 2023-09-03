@@ -33,9 +33,9 @@ void LineDrawer::setLastPoints() {
 		case Bezier: {
 			m_lastBegin = m_begin;
 			m_lastEnd = m_end;
-			if (this->isContinuing()) {
-				m_lastEnd = m_begin - (m_end - m_begin);
-			}
+			// if (this->isContinuing()) {
+			// 	m_lastEnd = m_begin - (m_end - m_begin);
+			// }
 		} break;
 
 		default: break;
@@ -60,7 +60,8 @@ std::vector<ObjectData> LineDrawer::generate() {
 
 		case Bezier: {
 			generator = std::make_unique<BezierLineGenerator>();
-			points = { m_lastBegin, m_lastEnd, m_end, m_begin };
+			auto control = this->isContinuing() ? m_begin - (m_end - m_begin) : m_end;
+			points = { m_lastBegin, m_lastEnd, control, m_begin };
 		} break;
 
 		default: return {};
@@ -79,16 +80,21 @@ void LineDrawer::drawOverlay() {
 
 		case Bezier: {
 			m_drawLayer->drawDot(m_begin, 7, { 1, 0.5, 1, 1 });
-			m_drawLayer->drawDot(m_end, 5, { 0.5, 1, 1, 1 });
-			m_drawLayer->drawSegment(m_begin, m_end, 1, { 0.5, 1, 1, 1 });
 			if (this->isContinuing()) {
 				auto control = m_begin - (m_end - m_begin);
-				m_drawLayer->drawDot(control, 5, { 1, 1, 0.5, 1 });
-				m_drawLayer->drawSegment(m_begin, control, 1, { 1, 1, 0.5, 1 });
+				m_drawLayer->drawDot(control, 5, { 0.5, 1, 1, 1 });
+				m_drawLayer->drawSegment(m_begin, control, 1, { 0.5, 1, 1, 1 });
+
+				m_drawLayer->drawDot(m_end, 5, { 1, 1, 0.5, 1 });
+				m_drawLayer->drawSegment(m_begin, m_end, 1, { 1, 1, 0.5, 1 });
 
 				m_drawLayer->drawDot(m_lastBegin, 7, { 1, 0.5, 1, 1 });
 				m_drawLayer->drawDot(m_lastEnd, 5, { 0.5, 1, 1, 1 });
 				m_drawLayer->drawSegment(m_lastBegin, m_lastEnd, 1, { 0.5, 1, 1, 1 });
+			}
+			else {
+				m_drawLayer->drawDot(m_end, 5, { 0.5, 1, 1, 1 });
+				m_drawLayer->drawSegment(m_begin, m_end, 1, { 0.5, 1, 1, 1 });
 			}
 		} break;
 
