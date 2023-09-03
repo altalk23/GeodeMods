@@ -80,7 +80,8 @@ namespace agg {
 			}
 
 			// edge case
-			if (x1 == x2 && y1 == y2 && x3 == x4 && y3 == y4) {
+			if (std::abs(x1 - x2) < 0.1 && std::abs(y1 - y2) < 0.1 && std::abs(x3 - x4) < 0.1 &&
+				std::abs(y3 - y4) < 0.1) {
 				return;
 			}
 
