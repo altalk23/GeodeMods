@@ -152,3 +152,117 @@ std::vector<ObjectData> BezierLineGenerator::generate(
 
 	return ret;
 }
+
+std::vector<ObjectData> RectangleFillBezierLineGenerator::generate(
+	cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
+	LineData const& data
+) {
+	auto generator = agg::curve4_div(ap, bp, cp, dp);
+
+	auto ret = std::vector<ObjectData>();
+	auto width = data.thickness;
+
+	for (size_t i = 0; i < generator.m_points.size() - 1; ++i) {
+		auto begin = generator.m_points[i];
+		auto end = generator.m_points[i + 1];
+
+		// time for some hardcore math
+		// what did i do to deserve this
+		auto aval = [&](auto p1, auto p2) {
+			return p1.y - p2.y;
+		};
+
+		auto bval = [&](auto p1, auto p2) {
+			return p2.x - p1.x;
+		};
+
+		auto cval = [&](auto p1, auto p2) {
+			return (p1.x - p2.x) * p1.y + (p2.y - p1.y) * p1.x;
+		};
+
+		auto intersect = [&](auto p1, auto p2, auto r1, auto r2) {
+			auto a1 = aval(p1, p2);
+			auto b1 = bval(p1, p2);
+			auto c1 = cval(p1, p2);
+
+			auto a2 = aval(r1, r2);
+			auto b2 = bval(r1, r2);
+			auto c2 = cval(r1, r2);
+			return CCPointMake(
+				(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1), (c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1)
+			);
+		};
+
+		auto offsetval = [&](auto p1, auto p2, auto p3) {
+			auto angle = (p1 - p2).getAngle(p3 - p2);
+
+			if (angle < 0) {
+				// right side
+				return ((p1 - p2).getPerp().normalize() * width / 2);
+			}
+			else {
+				// left side
+				return ((p1 - p2).getRPerp().normalize() * width / 2);
+			}
+		};
+
+		auto extendval = [&](auto p1, auto p2, auto p3) {
+			auto poff = offsetval(p1, p2, p3);
+			auto roff = offsetval(p3, p2, p1);
+
+			auto s1 = p1 + poff;
+			auto s2 = p2 + poff;
+			auto r1 = p2 + roff;
+			auto r2 = p3 + roff;
+
+			auto inter = intersect(s1, s2, r1, r2);
+
+			return std::make_pair(inter - roff, inter - poff);
+		};
+
+		if (i > 0) {
+			auto a1 = generator.m_points[i - 1];
+			auto a2 = generator.m_points[i];
+			auto a3 = generator.m_points[i + 1];
+
+			begin = extendval(a1, a2, a3).first;
+		}
+
+		if (i < generator.m_points.size() - 2) {
+			auto a2 = generator.m_points[i];
+			auto a3 = generator.m_points[i + 1];
+			auto a4 = generator.m_points[i + 2];
+
+			end = extendval(a2, a3, a4).second;
+		}
+
+		auto add = LineGenerator().generate(begin, end, data);
+		ret.insert(ret.end(), add.begin(), add.end());
+	}
+
+	return ret;
+}
+
+std::vector<ObjectData> RoundedFillBezierLineGenerator::generate(
+	cocos2d::CCPoint ap, cocos2d::CCPoint bp, cocos2d::CCPoint cp, cocos2d::CCPoint dp,
+	LineData const& data
+) {
+	auto generator = agg::curve4_div(ap, bp, cp, dp);
+
+	auto ret = std::vector<ObjectData>();
+	auto width = data.thickness;
+
+	for (size_t i = 0; i < generator.m_points.size() - 1; ++i) {
+		auto begin = generator.m_points[i];
+		auto end = generator.m_points[i + 1];
+
+		if (i < generator.m_points.size() - 2) {
+			ret.push_back({ end, data.thickness / 9, 0, 725 });
+		}
+
+		auto add = LineGenerator().generate(begin, end, data);
+		ret.insert(ret.end(), add.begin(), add.end());
+	}
+
+	return ret;
+}
