@@ -3,6 +3,7 @@
 #include <Geode/DefaultInclude.hpp>
 #include <Geode/Loader.hpp>
 #import <Geode/cocos/platform/mac/EAGLView.h>
+#include <Geode/utils/ObjcHook.hpp>
 #import <objc/runtime.h>
 
 using namespace geode::prelude;
@@ -118,25 +119,22 @@ bool addMethod(Class class_, SEL selector, Type function) {
 	return class_addMethod(class_, selector, (IMP)function, @encode(Type));
 }
 
+void empty() {}
+
+template <class Func>
+void createHook(std::string const& className, std::string const& funcName, Func function) {
+	if (auto res = ObjcHook::create(className, funcName, function, &empty)) {
+		(void)Mod::get()->addHook(res.unwrap());
+	}
+}
+
 void appControllerHooks() {
-	Class class_ = objc_getClass("AppController");
-
-	addMethod(class_, @selector(windowWillEnterFullScreen:), &windowWillEnterFullScreen);
-	addMethod(class_, @selector(windowWillExitFullScreen:), &windowWillExitFullScreen);
-
-	// s_applicationDidFinishLaunching = replaceMethod(
-	// 	class_, @selector(applicationDidFinishLaunching:), &applicationDidFinishLaunching
-	// );
-
-	(void)Mod::get()->addHook(Hook::create(
-		Mod::get(), (void*)(base::get() + 0x69a0), &applicationDidFinishLaunching,
-		"AppController::applicationDidFinishLaunching:", tulip::hook::TulipConvention::Default
-	));
-
 	// replaceMethod(class_, @selector(applicationWillBecomeActive:), &applicationWillBecomeActive);
 	// replaceMethod(class_, @selector(applicationWillResignActive:), &applicationWillResignActive);
 }
 
 $execute {
-	appControllerHooks();
+	createHook("AppController", "windowWillEnterFullScreen:", &windowWillEnterFullScreen);
+	createHook("AppController", "windowWillExitFullScreen:", &windowWillExitFullScreen);
+	createHook("AppController", "applicationDidFinishLaunching:", &applicationDidFinishLaunching);
 }

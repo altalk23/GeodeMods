@@ -21,22 +21,30 @@ void startMainLoop(CCDirectorCaller*, SEL) {
 	FPSBypass::get()->startMainLoop();
 }
 
-static IMP s_applicationShouldTerminate;
-
-NSApplicationTerminateReply applicationShouldTerminate(
-	void* controller, SEL sel, NSApplication* sender
-) {
-	using Type = decltype(&applicationShouldTerminate);
+template <class Return = bool>
+Return wrapOpenGLContextDestroy(id self, SEL sel, NSEvent* event) {
 	FPSBypass::get()->destroy();
-	return reinterpret_cast<Type>(s_applicationShouldTerminate)(controller, sel, sender);
+
+	NSOpenGLView* openGLView = [NSClassFromString(@"EAGLView") sharedEGLView];
+	NSOpenGLContext* glContext = [openGLView openGLContext];
+
+	[glContext makeCurrentContext];
+	CGLLockContext([glContext CGLContextObj]);
+
+	NSInvocation* invocation = [NSInvocation
+		invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:sel]];
+	[invocation setSelector:sel];
+	[invocation setTarget:self];
+	[invocation invoke];
+	[invocation setArgument:event atIndex:2];
+	Return returnValue;
+	[invocation getReturnValue:&returnValue];
+
+	CGLUnlockContext([glContext CGLContextObj]);
+
+	return returnValue;
 }
 
-using EventType = void (*)(id, SEL, NSEvent*);
-
-template <int Value>
-static IMP s_eventImplementation;
-
-template <int Value>
 void wrapOpenGLContext(id self, SEL sel, NSEvent* event) {
 	NSOpenGLView* openGLView = [NSClassFromString(@"EAGLView") sharedEGLView];
 	NSOpenGLContext* glContext = [openGLView openGLContext];
@@ -44,64 +52,18 @@ void wrapOpenGLContext(id self, SEL sel, NSEvent* event) {
 	[glContext makeCurrentContext];
 	CGLLockContext([glContext CGLContextObj]);
 
-	reinterpret_cast<EventType>(s_eventImplementation<Value>)(self, sel, event);
+	[self performSelector:sel withObject:event];
 
 	CGLUnlockContext([glContext CGLContextObj]);
 }
 
-template <class Type>
-IMP replaceMethod(Class class_, SEL selector, Type function) {
-	return class_replaceMethod(class_, selector, (IMP)function, @encode(Type));
-}
+void empty() {}
 
-template <class Type>
-bool addMethod(Class class_, SEL selector, Type function) {
-	return class_addMethod(class_, selector, (IMP)function, @encode(Type));
-}
-
-void appControllerHooks() {
-	Class class_ = objc_getClass("AppController");
-
-	s_applicationShouldTerminate =
-		replaceMethod(class_, @selector(applicationShouldTerminate:), &applicationShouldTerminate);
-}
-
-void directorCallerHooks() {
-	Class class_ = objc_getClass("CCDirectorCaller");
-
-	replaceMethod(class_, @selector(setAnimationInterval:), &setAnimationInterval);
-	replaceMethod(class_, @selector(startMainLoop), &startMainLoop);
-}
-
-void eaglViewHooks() {
-	Class class_ = objc_getClass("EAGLView");
-
-#define EAGL_HOOK(Id_, Sel_) \
-	s_eventImplementation<Id_> = replaceMethod(class_, @selector(Sel_), &wrapOpenGLContext<Id_>);
-
-	// Mouse
-	EAGL_HOOK(0, mouseDown:);
-	EAGL_HOOK(1, mouseUp:);
-	EAGL_HOOK(2, mouseMoved:);
-	EAGL_HOOK(3, mouseDragged:);
-	EAGL_HOOK(4, rightMouseDown:);
-	EAGL_HOOK(5, rightMouseDragged:);
-	EAGL_HOOK(6, rightMouseUp:);
-	EAGL_HOOK(7, otherMouseDown:);
-	EAGL_HOOK(8, otherMouseDragged:);
-	EAGL_HOOK(9, otherMouseUp:);
-	EAGL_HOOK(10, scrollWheel:);
-	EAGL_HOOK(11, mouseEntered:);
-	EAGL_HOOK(12, mouseExited:);
-
-	EAGL_HOOK(13, keyDown:);
-	EAGL_HOOK(14, keyUp:);
-	EAGL_HOOK(15, flagsChanged:);
-
-	EAGL_HOOK(16, touchesBeganWithEvent:);
-	EAGL_HOOK(17, touchesMovedWithEvent:);
-	EAGL_HOOK(18, touchesEndedWithEvent:);
-	EAGL_HOOK(19, touchesCancelledWithEvent:);
+template <class Func>
+void createHook(std::string const& className, std::string const& funcName, Func function) {
+	if (auto res = ObjcHook::create(className, funcName, function, &empty)) {
+		(void)Mod::get()->addHook(res.unwrap());
+	}
 }
 
 static auto fpsEvent = listenForSettingChanges(
@@ -135,7 +97,34 @@ $on_mod(Enabled) {
 	CCDirectorCallerMake* caller = [NSClassFromString(@"CCDirectorCaller") sharedDirectorCaller];
 	[caller->renderTimer invalidate];
 
-	appControllerHooks();
-	directorCallerHooks();
-	eaglViewHooks();
+	// createHook("AppController", "applicationShouldTerminate:", &applicationShouldTerminate);
+
+	createHook("AppController", "windowShouldClose:", &wrapOpenGLContextDestroy<bool>);
+	createHook("AppController", "applicationShouldTerminate:", &wrapOpenGLContextDestroy<NSApplicationTerminateReply>);
+
+	createHook("CCDirectorCaller", "setAnimationInterval:", &setAnimationInterval);
+	createHook("CCDirectorCaller", "startMainLoop", &startMainLoop);
+
+	createHook("EAGLView", "mouseDown:", &wrapOpenGLContext);
+	createHook("EAGLView", "mouseUp:", &wrapOpenGLContext);
+	createHook("EAGLView", "mouseMoved:", &wrapOpenGLContext);
+	createHook("EAGLView", "mouseDragged:", &wrapOpenGLContext);
+	createHook("EAGLView", "rightMouseDown:", &wrapOpenGLContext);
+	createHook("EAGLView", "rightMouseDragged:", &wrapOpenGLContext);
+	createHook("EAGLView", "rightMouseUp:", &wrapOpenGLContext);
+	createHook("EAGLView", "otherMouseDown:", &wrapOpenGLContext);
+	createHook("EAGLView", "otherMouseDragged:", &wrapOpenGLContext);
+	createHook("EAGLView", "otherMouseUp:", &wrapOpenGLContext);
+	createHook("EAGLView", "scrollWheel:", &wrapOpenGLContext);
+	createHook("EAGLView", "mouseEntered:", &wrapOpenGLContext);
+	createHook("EAGLView", "mouseExited:", &wrapOpenGLContext);
+
+	createHook("EAGLView", "keyDown:", &wrapOpenGLContext);
+	createHook("EAGLView", "keyUp:", &wrapOpenGLContext);
+	createHook("EAGLView", "flagsChanged:", &wrapOpenGLContext);
+
+	createHook("EAGLView", "touchesBeganWithEvent:", &wrapOpenGLContext);
+	createHook("EAGLView", "touchesMovedWithEvent:", &wrapOpenGLContext);
+	createHook("EAGLView", "touchesEndedWithEvent:", &wrapOpenGLContext);
+	createHook("EAGLView", "touchesCancelledWithEvent:", &wrapOpenGLContext);
 }
