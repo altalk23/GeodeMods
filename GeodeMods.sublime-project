@@ -21,6 +21,14 @@
 					"name": "CodegenRun",
 				},
 				{
+					"build_target": "DrawingUtilities",
+					"name": "DrawingUtilities",
+				},
+				{
+					"build_target": "DrawingUtilities_PACKAGE",
+					"name": "DrawingUtilities_PACKAGE",
+				},
+				{
 					"build_target": "FPSBypass",
 					"name": "FPSBypass",
 				},
@@ -37,26 +45,27 @@
 					"name": "FPSShower_PACKAGE",
 				},
 				{
-					"build_target": "FullscreenFix",
+					/*"build_target": "cstool",*/
 					"name": "FullscreenFix",
+					/*"target": "ctest_run",*/
+					"build_target": "FullscreenFix",
 				},
 				{
 					"build_target": "FullscreenFix_PACKAGE",
 					"name": "FullscreenFix_PACKAGE",
 				},
 				{
-					/*"build_target": "cstool",*/
-					"name": "GeodeCodegenSources",
-					/*"target": "ctest_run",*/
 					"build_target": "GeodeCodegenSources",
+					"name": "GeodeCodegenSources",
 				},
 				{
 					"build_target": "GeodeFilesystemImpl",
 					"name": "GeodeFilesystemImpl",
 				},
 				{
-					"build_target": "SmallAdditions",
 					"name": "SmallAdditions",
+					/*"target": "ctest_run"*/
+					"build_target": "SmallAdditions",
 				},
 				{
 					"build_target": "SmallAdditions_PACKAGE",
