@@ -5,7 +5,7 @@
 
 struct MusicResourcesPath : Modify<MusicResourcesPath, MusicDownloadManager> {
 	static void onModify(auto& self) {
-		(void)self.setHookPriority("MusicResourcesPath::pathForSong", -0x10000); // not calling orig
+		(void)self.setHookPriority("MusicResourcesPath::pathForSong", 0x10000); // not calling orig
 	}
 
 	gd::string pathForSong(int songID) {
