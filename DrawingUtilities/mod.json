@@ -4,5 +4,10 @@
 	"id": "alk.drawing-utilities",
 	"name": "Drawing Utilities",
 	"developer": "alk",
-	"description": "Some editor drawing utilities"
+	"description": "Some editor drawing utilities",
+	"resources": {
+		"sprites": [
+			"resources/test.png"
+		]
+	}
 }

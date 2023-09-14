@@ -20,7 +20,7 @@ namespace tulip::editor {
 		geode::Ref<cocos2d::CCDrawNode> m_drawLayer;
 
 		UsedGenerator m_used;
-		float m_thickness = 6;
+		float m_thickness = 10;
 
 		cocos2d::CCPoint m_lastBegin;
 		cocos2d::CCPoint m_lastEnd;

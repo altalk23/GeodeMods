@@ -36,6 +36,7 @@ struct ToggleFullscreenReplace : Modify<ToggleFullscreenReplace, PlatformToolbox
 		auto window = [[NSApplication sharedApplication] mainWindow];
 
 		[window toggleFullScreen:nil];
+		GameManager::get()->setGameVariable("0025", !fullscreen);
 	}
 };
 
@@ -43,6 +44,7 @@ static IMP s_applicationDidFinishLaunching;
 
 void applicationDidFinishLaunching(id self, SEL selector, NSNotification* notification) {
 	auto windowed = GameManager::get()->getGameVariable("0025");
+	log::debug("windowed {}", windowed);
 	if (!windowed) {
 		GameManager::get()->setGameVariable("0025", true);
 	}
@@ -62,6 +64,7 @@ void applicationDidFinishLaunching(id self, SEL selector, NSNotification* notifi
 }
 
 void windowWillEnterFullScreen(id self, SEL selector, NSNotification* notification) {
+	log::debug("windowWillEnterFullScreen");
 	auto screenFrame = [[NSScreen mainScreen] frame];
 
 	CCEGLView::sharedOpenGLView()->setFrameSize(screenFrame.size.width, screenFrame.size.height);
@@ -74,6 +77,7 @@ void windowWillEnterFullScreen(id self, SEL selector, NSNotification* notificati
 }
 
 void windowWillExitFullScreen(id self, SEL selector, NSNotification* notification) {
+	log::debug("windowWillExitFullScreen");
 	auto screenFrame = [[NSScreen mainScreen] frame];
 
 	CCEGLView::sharedOpenGLView()->setFrameSize(screenFrame.size.width, screenFrame.size.height);
@@ -119,11 +123,12 @@ bool addMethod(Class class_, SEL selector, Type function) {
 	return class_addMethod(class_, selector, (IMP)function, @encode(Type));
 }
 
+template <auto Function>
 void empty() {}
 
-template <class Func>
-void createHook(std::string const& className, std::string const& funcName, Func function) {
-	if (auto res = ObjcHook::create(className, funcName, function, &empty)) {
+template <auto Function>
+void createHook(std::string const& className, std::string const& funcName) {
+	if (auto res = ObjcHook::create(className, funcName, Function, &empty<Function>)) {
 		(void)Mod::get()->addHook(res.unwrap());
 	}
 }
@@ -134,7 +139,104 @@ void appControllerHooks() {
 }
 
 $execute {
-	createHook("AppController", "windowWillEnterFullScreen:", &windowWillEnterFullScreen);
-	createHook("AppController", "windowWillExitFullScreen:", &windowWillExitFullScreen);
-	createHook("AppController", "applicationDidFinishLaunching:", &applicationDidFinishLaunching);
+	createHook<&windowWillEnterFullScreen>("AppController", "windowWillEnterFullScreen:");
+	createHook<&windowWillExitFullScreen>("AppController", "windowWillExitFullScreen:");
+	createHook<&applicationDidFinishLaunching>("AppController", "applicationDidFinishLaunching:");
 }
+
+// id initWithFrame(EAGLView* self, SEL selector, NSRect frameRect, NSOpenGLPixelFormat* format) {
+// 	NSOpenGLPixelFormatAttribute attribs[] = {
+// 		// NSOpenGLPFAAccelerated,
+// 		// NSOpenGLPFANoRecovery,
+// 		NSOpenGLPFADoubleBuffer,  NSOpenGLPFADepthSize,         24, NSOpenGLPFAStencilSize, 8,
+// 		NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersionLegacy, 0
+// 		// , 0
+// 	};
+
+// 	NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
+
+// 	auto ret = [self initWithFrame:frameRect pixelFormat:pixelFormat];
+
+// 	// log::debug("OpenGL version = {}", (char const*)glGetString(GL_VERSION));
+// 	// log::debug("GLSL version = {}", (char const*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+// 	return ret;
+// }
+
+// $execute {
+// 	if (auto res = ObjcHook::create("EAGLView", "initWithFrame:pixelFormat:", &initWithFrame)) {
+// 		Mod::get()->addHook(res.unwrap());
+// 	}
+// }
+
+// #include <Geode/modify/CCGLProgram.hpp>
+
+// class MyShaderProgram : public CCGLProgram {
+// public:
+// };
+
+// struct CompileShader : Modify<CompileShader, CCGLProgram> {
+// 	std::string getShaderLog(GLuint object) {
+// 		GLint length, written;
+// 		glGetShaderiv(object, GL_INFO_LOG_LENGTH, &length);
+// 		log::debug("object {} log length {}", object, length);
+// 		if (length <= 0) {
+// 			return "";
+// 		}
+// 		auto stuff = new char[length + 1];
+// 		glGetShaderInfoLog(object, length, &written, stuff);
+// 		std::string result(stuff);
+// 		log::debug(
+// 			"{} {} {} {}", (void*)stuff[0], (void*)stuff[1], (void*)stuff[2], (void*)stuff[3]
+// 		);
+// 		delete[] stuff;
+// 		return result;
+// 	}
+
+// 	bool compileShader(GLuint* shader, GLenum type, GLchar const* source) {
+// 		GLint status;
+
+// 		if (!source) {
+// 			return false;
+// 		}
+
+// 		GLchar const* sources[] = {
+// 			"#version 120\n"
+// 			"uniform mat4 CC_PMatrix;\n"
+// 			"uniform mat4 CC_MVMatrix;\n"
+// 			"uniform mat4 CC_MVPMatrix;\n"
+// 			"uniform vec4 CC_Time;\n"
+// 			"uniform vec4 CC_SinTime;\n"
+// 			"uniform vec4 CC_CosTime;\n"
+// 			"uniform vec4 CC_Random01;\n"
+// 			"//CC INCLUDES END\n\n",
+// 			source,
+// 		};
+
+// 		*shader = glCreateShader(type);
+// 		glShaderSource(*shader, sizeof(sources) / sizeof(*sources), sources, NULL);
+// 		glCompileShader(*shader);
+
+// 		log::debug("compiling {}, {}", *shader, type);
+
+// 		glGetShaderiv(*shader, GL_COMPILE_STATUS, &status);
+
+// 		log::debug("OpenGL extensions = {}", (char const*)glGetString(GL_EXTENSIONS));
+// 		if (!status) {
+// 			GLsizei length;
+// 			glGetShaderiv(*shader, GL_SHADER_SOURCE_LENGTH, &length);
+// 			GLchar* src = (GLchar*)malloc(sizeof(GLchar) * length);
+
+// 			glGetShaderSource(*shader, length, NULL, src);
+
+// 			log::debug("GLSL version = {}", (char const*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+// 			log::error("cocos2d: ERROR: Failed to compile shader:\n{}", src);
+// 			log::debug("cocos2d: {}", getShaderLog(*shader));
+// 			free(src);
+
+// 			return false;
+// 		}
+// 		return (status == GL_TRUE);
+// 	}
+// };

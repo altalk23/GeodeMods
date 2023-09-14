@@ -192,4 +192,9 @@ void LineDrawer::setEditor(EditorUI* editor) {
 	m_drawLayer = CCDrawNode::create();
 	m_editor->m_editorLayer->m_objectLayer->addChild(m_lineLayer);
 	m_editor->m_editorLayer->m_objectLayer->addChild(m_drawLayer, 100);
+
+	auto test = CCSprite::create("test.png"_spr);
+	test->setOpacity(63);
+	test->setPosition({ 300, 300 });
+	m_editor->m_editorLayer->m_objectLayer->addChild(test);
 }

@@ -57,7 +57,7 @@ void FPSBypass::updateLoop() {
 
 	CCDirector::sharedDirector()->getScheduler()->update(newDelta);
 
-	CCPoolManager::sharedPoolManager()->pop();
+	// CCPoolManager::sharedPoolManager()->pop();
 
 	CGLUnlockContext([glContext CGLContextObj]);
 
@@ -80,9 +80,7 @@ void FPSBypass::displayLoop(bool paused) {
 	CCDirector::sharedDirector()->drawScene();
 	cocos2d::CCDirector::sharedDirector()->setPaused(false);
 
-	if (!paused) {
-		CCPoolManager::sharedPoolManager()->pop();
-	}
+	CCPoolManager::sharedPoolManager()->pop();
 
 	[glContext flushBuffer];
 
