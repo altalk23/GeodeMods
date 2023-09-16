@@ -3,12 +3,12 @@
 	[
 		
 		{
-			"config": "Default",
+			"config": "Debug",
 			"env":
 			{
 			},
 			"generator": "Ninja",
-			"name": "Default",
+			"name": "Debug",
 			"target": "cmake_build",
 			"variants":
 			[
@@ -65,16 +65,22 @@
 				{
 					"name": "SmallAdditions",
 					/*"target": "ctest_run"*/
+					/*"build_target": "SmallAdditions",*/
+					/*"target": "ctest_run",*/
 					"build_target": "SmallAdditions",
 				},
+/*{
+					"name": "fmt",
+					/*"target": "ctest_run"* /
+					"build_target": "fmt",
+				},*/
 				{
 					"build_target": "SmallAdditions_PACKAGE",
-					"name": "SmallAdditions_PACKAGE",
+					"name": "SmallAdditions_PACKAGE"
 				},
 				{
-					"name": "fmt",
-					/*"target": "ctest_run"*/
 					"build_target": "fmt",
+					"name": "fmt"
 				},
 				{
 					"build_target": "mat-json",
@@ -85,7 +91,7 @@
 					"target": "ctest_run"
 				},
 			],
-			"working_dir": "${project_path}/build",
+			"working_dir": "${project_path}/build/android",
 		},
 	],
 	"folders":
@@ -102,13 +108,19 @@
 		"cmake":
 		{
 			"generator": "Ninja",
-			"build_folder": "${project_path}/build",
+			"build_folder": "${project_path}/build/android",
 			"command_line_overrides":
             {
                 "CMAKE_C_COMPILER": "/usr/local/opt/llvm/bin/clang",
 	            "CMAKE_CXX_COMPILER": "/usr/local/opt/llvm/bin/clang++",
 	            "CMAKE_C_COMPILER_LAUNCHER": "/usr/local/bin/ccache",
 	            "CMAKE_CXX_COMPILER_LAUNCHER": "/usr/local/bin/ccache",
+
+	            // "CMAKE_TOOLCHAIN_FILE": "/Applications/AndroidNDK.app/Contents/NDK/build/cmake/android.toolchain.cmake",
+	            // "ANDROID_ABI": "armeabi-v7a",
+	            // "ANDROID_ARM_NEON": "ON",
+	            // "ANDROID_PLATFORM": "android-28",
+	            // "CMAKE_BUILD_TYPE": "Debug",
             },
 		},
 	},

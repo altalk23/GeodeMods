@@ -1,4 +1,4 @@
-project(SmallAdditions VERSION 2.2.5)
+project(SmallAdditions VERSION 2.2.6)
 
 file(GLOB SOURCES
 	src/*.cpp
