@@ -1,5 +1,6 @@
 #include <LineDrawer.hpp>
 #include <LineGenerator.hpp>
+#include <nanosvg.h>
 
 using namespace geode::prelude;
 using namespace tulip::editor;
@@ -43,6 +44,78 @@ void LineDrawer::setLastPoints() {
 
 		default: break;
 	}
+}
+
+void LineDrawer::svgTest() {
+	struct NSVGimage* image;
+	auto path = file::pickFile(file::PickMode::OpenFile, { std::nullopt, {} });
+	if (!path) {
+		return;
+	}
+	image = nsvgParseFromFile(
+		CCFileUtils::get()->fullPathForFilename(path->c_str(), false).c_str(), "px", 96
+	);
+	// log::debug("size: {} x {}\n", image->width, image->height);
+
+	auto objCount = 0;
+	// Use...
+	for (auto shape = image->shapes; shape != NULL; shape = shape->next) {
+		float thickness = shape->strokeWidth;
+		// log::debug("path thickness: {}", thickness);
+		for (auto path = shape->paths; path != NULL; path = path->next) {
+			// log::debug("point count: {}", path->npts);
+			for (auto i = 0; i < path->npts - 1; i += 3) {
+				float* p = &path->pts[i * 2];
+				// log::debug(
+				// 	"points ({} {}) ({} {}) ({} {}) ({} {})", p[0], p[1], p[2], p[3], p[4], p[5],
+				// 	p[6], p[7]
+				// );
+				auto p1 = CCPointMake(p[0] + 300, image->height - p[1]);
+				auto p2 = CCPointMake(p[2] + 300, image->height - p[3]);
+				auto p3 = CCPointMake(p[4] + 300, image->height - p[5]);
+				auto p4 = CCPointMake(p[6] + 300, image->height - p[7]);
+
+				if (p1 == p2 && p3 == p4) {
+					continue;
+				}
+				auto div = (p4 - p1) / 3;
+				if ((p1 + div).fuzzyEquals(p2, 0.01) && (p4 - div).fuzzyEquals(p3, 0.01)) {
+					auto generated =
+						LineGenerator().generate({ p1, p4 }, { thickness, i != 0, 0.2 });
+					// log::debug("line generated {}", generated.size());
+					if (generated.size() < 150) {
+						objCount += generated.size();
+
+						// log::debug("obj count {}, total {}", generated.size(), objCount);
+
+						this->drawData(generated);
+					}
+				}
+				else {
+					auto generated = BezierLineGenerator().generate(
+						{ p1, p2, p3, p4 }, { thickness, i != 0, 0.2 }
+					);
+					// log::debug("bezier generated {}", generated.size());
+					if (generated.size() < 150) {
+						objCount += generated.size();
+
+						// log::debug("obj count {}, total {}", generated.size(), objCount);
+
+						this->drawData(generated);
+					}
+				}
+			}
+		}
+	}
+
+	for (auto obj : CCArrayExt<GameObject*>(m_lineObjects)) {
+		m_editor->m_editorLayer->addToSection(obj);
+		m_editor->m_editorLayer->addSpecial(obj);
+	}
+	this->clearObjects();
+
+	// Delete
+	nsvgDelete(image);
 }
 
 std::vector<ObjectData> LineDrawer::generate() {
@@ -112,6 +185,39 @@ void LineDrawer::drawOverlay() {
 	}
 }
 
+void LineDrawer::drawData(std::vector<ObjectData> const& generated) {
+	for (auto& data : generated) {
+		// log::debug("object {} {}", data.position, data.rotation);
+		auto obj = GameObject::createWithKey(data.id);
+
+		obj->customSetup();
+		obj->addColorSprite();
+		obj->setupCustomSprites();
+
+		obj->setPosition(data.position);
+		obj->setStartPos(data.position);
+		m_lineObjects->addObject(obj);
+
+		obj->setRotation(data.rotation);
+
+		obj->m_scale = data.scale;
+		obj->setRScale(1.0f);
+		obj->m_isObjectRectDirty = true;
+		obj->m_textureRectDirty = true;
+
+		if (obj->m_baseColor) {
+			obj->m_baseColor->m_colorID = 1011;
+			obj->m_shouldUpdateColorSprite = true;
+		}
+		if (obj->m_detailColor) {
+			obj->m_detailColor->m_colorID = 1011;
+			obj->m_shouldUpdateColorSprite = true;
+		}
+
+		m_lineLayer->addChild(obj);
+	}
+}
+
 void LineDrawer::generateLine() {
 	this->clearObjects();
 
@@ -120,36 +226,7 @@ void LineDrawer::generateLine() {
 
 		// auto generated = LineGenerator().generate(m_fields->begin, m_fields->end, { 15 });
 
-		for (auto& data : generated) {
-			// log::debug("object {} {}", data.position, data.rotation);
-			auto obj = GameObject::createWithKey(data.id);
-
-			obj->customSetup();
-			obj->addColorSprite();
-			obj->setupCustomSprites();
-
-			obj->setPosition(data.position);
-			obj->setStartPos(data.position);
-			m_lineObjects->addObject(obj);
-
-			obj->setRotation(data.rotation);
-
-			obj->m_scale = data.scale;
-			obj->setRScale(1.0f);
-			obj->m_isObjectRectDirty = true;
-			obj->m_textureRectDirty = true;
-
-			if (obj->m_baseColor) {
-				obj->m_baseColor->m_colorID = 1011;
-				obj->m_shouldUpdateColorSprite = true;
-			}
-			if (obj->m_detailColor) {
-				obj->m_detailColor->m_colorID = 1011;
-				obj->m_shouldUpdateColorSprite = true;
-			}
-
-			m_lineLayer->addChild(obj);
-		}
+		this->drawData(generated);
 	}
 }
 
@@ -193,8 +270,8 @@ void LineDrawer::setEditor(EditorUI* editor) {
 	m_editor->m_editorLayer->m_objectLayer->addChild(m_lineLayer);
 	m_editor->m_editorLayer->m_objectLayer->addChild(m_drawLayer, 100);
 
-	auto test = CCSprite::create("test.png"_spr);
-	test->setOpacity(63);
-	test->setPosition({ 300, 300 });
-	m_editor->m_editorLayer->m_objectLayer->addChild(test);
+	// auto test = CCSprite::create("test.png"_spr);
+	// test->setOpacity(63);
+	// test->setPosition({ 300, 300 });
+	// m_editor->m_editorLayer->m_objectLayer->addChild(test);
 }

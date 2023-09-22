@@ -93,12 +93,7 @@ static auto vsyncEvent = listenForSettingChanges(
 @implementation CCDirectorCallerMake
 @end
 
-$on_mod(Enabled) {
-	CCDirectorCallerMake* caller = [NSClassFromString(@"CCDirectorCaller") sharedDirectorCaller];
-	[caller->renderTimer invalidate];
-
-	// createHook("AppController", "applicationShouldTerminate:", &applicationShouldTerminate);
-
+$on_mod(Loaded) {
 	createHook("AppController", "windowShouldClose:", &wrapOpenGLContextDestroy<bool>);
 	createHook("AppController", "applicationShouldTerminate:", &wrapOpenGLContextDestroy<NSApplicationTerminateReply>);
 

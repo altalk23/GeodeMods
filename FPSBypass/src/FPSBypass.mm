@@ -114,6 +114,41 @@ void FPSBypass::setAnimationInterval(double interval) {
 	}
 }
 
+// #include <Geode/modify/CCConfiguration.hpp>
+
+// struct B : Modify<B, CCConfiguration> {
+// 	void gatherGPUInfo() {}
+// };
+
+// #include <Geode/modify/AppDelegate.hpp>
+
+// struct A : Modify<A, AppDelegate> {
+// 	bool applicationDidFinishLaunching() {
+// 		auto thing = glGetString(GL_VENDOR);
+// 		if (thing) {
+// 			log::debug("gl string {}", thing);
+// 		}
+// 		else {
+// 			log::debug("gl string 0");
+// 		}
+// 		auto error = glGetError();
+// 		if (error) {
+// 			log::debug("gl error {}", error);
+// 		}
+// 		else {
+// 			log::debug("gl error 0");
+// 		}
+
+// 		NSOpenGLView* openGLView = [NSClassFromString(@"EAGLView") sharedEGLView];
+// 		log::debug("openGLView {}", openGLView);
+
+// 		NSOpenGLContext* glContext = [openGLView openGLContext];
+// 		log::debug("glContext {}", glContext);
+
+// 		return AppDelegate::applicationDidFinishLaunching();
+// 	}
+// };
+
 void FPSBypass::startMainLoop() {
 	CVDisplayLinkRelease(displayLink);
 	displayLink = nil;

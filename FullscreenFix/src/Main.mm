@@ -44,7 +44,6 @@ static IMP s_applicationDidFinishLaunching;
 
 void applicationDidFinishLaunching(id self, SEL selector, NSNotification* notification) {
 	auto windowed = GameManager::get()->getGameVariable("0025");
-	log::debug("windowed {}", windowed);
 	if (!windowed) {
 		GameManager::get()->setGameVariable("0025", true);
 	}

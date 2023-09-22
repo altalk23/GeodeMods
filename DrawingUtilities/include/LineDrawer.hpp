@@ -31,6 +31,8 @@ namespace tulip::editor {
 
 		int m_dragCount = 0;
 
+		void svgTest();
+
 		void drawOverlay();
 
 		void setEditor(EditorUI* editor);
@@ -43,6 +45,8 @@ namespace tulip::editor {
 		void setLastPoints();
 
 		std::vector<ObjectData> generate();
+
+		void drawData(std::vector<ObjectData> const& data);
 
 		void began(cocos2d::CCPoint pos);
 		void moved(cocos2d::CCPoint pos);

@@ -76,6 +76,10 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		this->updateButtonState();
 	}
 
+	void onSvgButton(CCObject* sender) {
+		m_fields->drawer.svgTest();
+	}
+
 	bool init(LevelEditorLayer* editorLayer) {
 		if (!EditorUI::init(editorLayer)) {
 			return false;
@@ -100,6 +104,20 @@ struct LineButton : Modify<LineButton, EditorUI> {
 		button->setContentSize({ 40.0f, 40.0f });
 
 		menu->addChild(button);
+
+		auto button2Text = CCLabelBMFont::create("Import\nSVG", "bigFont.fnt");
+		button2Text->setAlignment(kCCTextAlignmentCenter);
+		auto button2Sprite = EditorButtonSprite::create(button2Text, EditorBaseColor::Cyan);
+
+		auto button2 = CCMenuItemSpriteExtra::create(
+			button2Sprite, this, menu_selector(LineButton::onSvgButton)
+		);
+		this->updateButtonState();
+
+		button2->setSizeMult(1.2);
+		button2->setContentSize({ 40.0f, 40.0f });
+
+		menu->addChild(button2);
 		menu->updateLayout();
 
 		return true;
