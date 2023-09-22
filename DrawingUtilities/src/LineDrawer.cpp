@@ -52,9 +52,7 @@ void LineDrawer::svgTest() {
 	if (!path) {
 		return;
 	}
-	image = nsvgParseFromFile(
-		CCFileUtils::get()->fullPathForFilename(path->c_str(), false).c_str(), "px", 96
-	);
+	image = nsvgParseFromFile(path->string().c_str(), "px", 96);
 	// log::debug("size: {} x {}\n", image->width, image->height);
 
 	auto objCount = 0;
