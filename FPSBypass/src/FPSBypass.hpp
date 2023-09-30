@@ -3,6 +3,7 @@
 #import <Cocoa/Cocoa.h>
 #include <Geode/Geode.hpp>
 #import <QuartzCore/CVDisplayLink.h>
+#include <thread>
 
 namespace tulip::fps {
 	class FPSBypass {

@@ -80,9 +80,8 @@ namespace agg {
 				return;
 			}
 
-			// edge case
 			if (std::abs(x1 - x2) < 0.1 && std::abs(y1 - y2) < 0.1 && std::abs(x3 - x4) < 0.1 &&
-				std::abs(y3 - y4) < 0.1) {
+				-std::abs(y3 - y4) < 0.1) {
 				return;
 			}
 
@@ -242,7 +241,11 @@ namespace agg {
 			double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4
 		) {
 			m_points.push_back(point_type(x1, y1));
+			// if (!(check_colinear(x1, y1, x2, y2, x4, y4) && check_colinear(x1, y1, x3, y3, x4,
+			// y4)
+			// 	)) {
 			recursive_bezier(x1, y1, x2, y2, x3, y3, x4, y4, 0);
+			// }
 			m_points.push_back(point_type(x4, y4));
 		}
 	};

@@ -102,16 +102,23 @@ void FPSBypass::setVSync(bool value) {
 }
 
 void FPSBypass::setAnimationInterval(double interval) {
-	[physicsTimer invalidate];
-	physicsTimer = nil;
+	auto thing2 = [this] {
+		if (physicsTimer) {
+			[physicsTimer invalidate];
+			physicsTimer = nil;
+		}
 
-	if (!vsync) {
-		auto thing = ^void(NSTimer* timer) { updateLoop(); };
+		if (!vsync) {
+			log::debug("timer {}", updateInterval);
+			auto thing = ^void(NSTimer* timer) { updateLoop(); };
 
-		physicsTimer = [NSTimer timerWithTimeInterval:interval repeats:YES block:thing];
-		[[NSRunLoop currentRunLoop] addTimer:physicsTimer forMode:NSDefaultRunLoopMode];
-		[[NSRunLoop currentRunLoop] addTimer:physicsTimer forMode:NSEventTrackingRunLoopMode];
-	}
+			physicsTimer = [NSTimer timerWithTimeInterval:updateInterval repeats:YES block:thing];
+			[[NSRunLoop currentRunLoop] addTimer:physicsTimer forMode:NSDefaultRunLoopMode];
+			[[NSRunLoop currentRunLoop] addTimer:physicsTimer forMode:NSEventTrackingRunLoopMode];
+		};
+	};
+	auto thing = ^void() { thing2(); };
+	[[NSRunLoop currentRunLoop] performBlock:thing];
 }
 
 // #include <Geode/modify/CCConfiguration.hpp>

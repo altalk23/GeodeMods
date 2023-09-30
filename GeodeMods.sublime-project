@@ -3,12 +3,12 @@
 	[
 		
 		{
-			"config": "Debug",
+			"config": "Release",
 			"env":
 			{
 			},
 			"generator": "Ninja",
-			"name": "Debug",
+			"name": "Release",
 			"target": "cmake_build",
 			"variants":
 			[
@@ -76,22 +76,31 @@
 				},*/
 				{
 					"build_target": "SmallAdditions_PACKAGE",
-					"name": "SmallAdditions_PACKAGE"
+					"name": "SmallAdditions_PACKAGE",
 				},
 				{
 					"build_target": "fmt",
-					"name": "fmt"
+					"name": "fmt",
 				},
 				{
 					"build_target": "mat-json",
-					"name": "mat-json"
+					"name": "mat-json",
+				},
+				{
+					"name": "nanosvg",
+					/*"target": "ctest_run"*/
+					"build_target": "nanosvg",
+				},
+				{
+					"build_target": "nanosvgrast",
+					"name": "nanosvgrast"
 				},
 				{
 					"name": "ctest",
 					"target": "ctest_run"
 				},
 			],
-			"working_dir": "${project_path}/build/android",
+			"working_dir": "${project_path}/build/release",
 		},
 	],
 	"folders":
@@ -108,7 +117,7 @@
 		"cmake":
 		{
 			"generator": "Ninja",
-			"build_folder": "${project_path}/build/android",
+			"build_folder": "${project_path}/build/release",
 			"command_line_overrides":
             {
                 "CMAKE_C_COMPILER": "/usr/local/opt/llvm/bin/clang",

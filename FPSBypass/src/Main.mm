@@ -9,10 +9,9 @@ using namespace geode::prelude;
 using namespace tulip::fps;
 
 void setAnimationInterval(CCDirectorCaller* self, SEL sel, double interval) {
+	log::debug("setAnimationInterval {} {} {}", 0, 0, interval);
 	if (interval == 0.25) {
-		return CCDirector::get()->setAnimationInterval(
-			1.0 / Mod::get()->getSettingValue<double>("fps")
-		);
+		return;
 	}
 	FPSBypass::get()->setAnimationInterval(interval);
 }

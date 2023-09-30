@@ -95,6 +95,10 @@ MaxEmptyLinesToKeep: 1
 LambdaBodyIndentation: Signature
 NamespaceIndentation: All
 
+Macros:
+-   $modify(X)=X
+-   $modify(X, Y)=X
+
 PPIndentWidth: -1
 
 PackConstructorInitializers: Never

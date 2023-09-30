@@ -206,6 +206,20 @@ namespace {
 
 			return std::make_pair(inter - roff, inter - poff);
 		}
+
+		static auto checkColinear(auto p1, auto p2, auto p3) {
+			double area = std::abs(
+				p1.x * double(p2.y - p3.y) + p2.x * double(p3.y - p1.y) + p3.x * double(p1.y - p2.y)
+			);
+
+			// if (area < 0.01) {
+			// 	log::debug(
+			// 		"colinear {} {} {} area {} {} {} {}", p1, p2, p3, area, p1.x * (p2.y - p3.y),
+			// 		p2.x * (p3.y - p1.y), p3.x * (p1.y - p2.y)
+			// 	);
+			// }
+			return area < 0.01;
+		}
 	};
 }
 
@@ -230,16 +244,23 @@ std::vector<ObjectData> BezierLineGenerator::generate(
 			auto a2 = generator.m_points[i];
 			auto a3 = generator.m_points[i + 1];
 
-			if (std::abs(BezierFill::angle(a1, a2, a3)) >= std::numbers::pi * 0.75) {
-				begin = BezierFill::extend(a1, a2, a3, width).first;
+			if (a1 != a2) {
+				if (std::abs(BezierFill::angle(a1, a2, a3)) >= std::numbers::pi * 0.75) {
+					begin = BezierFill::extend(a1, a2, a3, width).first;
+				}
+				else {}
 			}
-			else {}
 		}
 
 		if (i < generator.m_points.size() - 2) {
 			auto a2 = generator.m_points[i];
 			auto a3 = generator.m_points[i + 1];
 			auto a4 = generator.m_points[i + 2];
+
+			if (BezierFill::checkColinear(a2, a3, a4)) {
+				generator.m_points[i + 1] = generator.m_points[i];
+				continue;
+			}
 
 			if (std::abs(BezierFill::angle(a2, a3, a4)) >= std::numbers::pi * 0.75) {
 				end = BezierFill::extend(a2, a3, a4, width).second;

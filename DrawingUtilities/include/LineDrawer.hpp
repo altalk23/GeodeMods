@@ -22,6 +22,8 @@ namespace tulip::editor {
 		UsedGenerator m_used;
 		float m_thickness = 10;
 
+		int m_linkID = 10000;
+
 		cocos2d::CCPoint m_lastBegin;
 		cocos2d::CCPoint m_lastEnd;
 		cocos2d::CCPoint m_begin;

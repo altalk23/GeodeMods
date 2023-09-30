@@ -64,43 +64,22 @@ void LineDrawer::svgTest() {
 			// log::debug("point count: {}", path->npts);
 			for (auto i = 0; i < path->npts - 1; i += 3) {
 				float* p = &path->pts[i * 2];
-				// log::debug(
-				// 	"points ({} {}) ({} {}) ({} {}) ({} {})", p[0], p[1], p[2], p[3], p[4], p[5],
-				// 	p[6], p[7]
-				// );
 				auto p1 = CCPointMake(p[0] + 300, image->height - p[1]);
 				auto p2 = CCPointMake(p[2] + 300, image->height - p[3]);
 				auto p3 = CCPointMake(p[4] + 300, image->height - p[5]);
 				auto p4 = CCPointMake(p[6] + 300, image->height - p[7]);
 
-				if (p1 == p2 && p3 == p4) {
-					continue;
-				}
-				auto div = (p4 - p1) / 3;
-				if ((p1 + div).fuzzyEquals(p2, 0.01) && (p4 - div).fuzzyEquals(p3, 0.01)) {
-					auto generated =
-						LineGenerator().generate({ p1, p4 }, { thickness, i != 0, 0.2 });
-					// log::debug("line generated {}", generated.size());
-					if (generated.size() < 150) {
-						objCount += generated.size();
+				// log::debug("points ({}) ({}) ({}) ({})", p1, p2, p3, p4);
 
-						// log::debug("obj count {}, total {}", generated.size(), objCount);
+				auto generated =
+					BezierLineGenerator().generate({ p1, p2, p3, p4 }, { thickness, i != 0, 0.2 });
+				// log::debug("bezier generated {}", generated.size());
+				if (generated.size() < 150) {
+					objCount += generated.size();
 
-						this->drawData(generated);
-					}
-				}
-				else {
-					auto generated = BezierLineGenerator().generate(
-						{ p1, p2, p3, p4 }, { thickness, i != 0, 0.2 }
-					);
-					// log::debug("bezier generated {}", generated.size());
-					if (generated.size() < 150) {
-						objCount += generated.size();
-
-						// log::debug("obj count {}, total {}", generated.size(), objCount);
-
-						this->drawData(generated);
-					}
+					// log::debug("obj count {}, total {}", generated.size(), objCount);
+					++m_linkID;
+					this->drawData(generated);
 				}
 			}
 		}
@@ -196,7 +175,7 @@ void LineDrawer::drawData(std::vector<ObjectData> const& generated) {
 		obj->setStartPos(data.position);
 		m_lineObjects->addObject(obj);
 
-		obj->setRotation(data.rotation);
+		obj->setRotation(std::round(data.rotation));
 
 		obj->m_scale = data.scale;
 		obj->setRScale(1.0f);
@@ -211,6 +190,8 @@ void LineDrawer::drawData(std::vector<ObjectData> const& generated) {
 			obj->m_detailColor->m_colorID = 1011;
 			obj->m_shouldUpdateColorSprite = true;
 		}
+
+		// obj->m_linkedGroup = m_linkID;
 
 		m_lineLayer->addChild(obj);
 	}
@@ -247,6 +228,7 @@ void LineDrawer::ended(cocos2d::CCPoint pos) {
 		m_editor->m_editorLayer->addSpecial(obj);
 	}
 	this->clearObjects();
+	++m_linkID;
 
 	this->setLastPoints();
 	m_dragCount++;
