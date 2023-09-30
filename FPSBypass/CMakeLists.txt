@@ -1,4 +1,4 @@
-project(FPSBypass VERSION 1.0.10)
+project(FPSBypass VERSION 1.0.11)
 
 file(GLOB OBJC_SOURCES
 	src/*.mm

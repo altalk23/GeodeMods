@@ -9,9 +9,10 @@ using namespace geode::prelude;
 using namespace tulip::fps;
 
 void setAnimationInterval(CCDirectorCaller* self, SEL sel, double interval) {
-	log::debug("setAnimationInterval {} {} {}", 0, 0, interval);
 	if (interval == 0.25) {
-		return;
+		return CCDirector::get()->setAnimationInterval(
+			1.0 / Mod::get()->getSettingValue<double>("fps")
+		);
 	}
 	FPSBypass::get()->setAnimationInterval(interval);
 }
@@ -47,6 +48,21 @@ Return wrapOpenGLContextDestroy(id self, SEL sel, NSEvent* event) {
 void wrapOpenGLContext(id self, SEL sel, NSEvent* event) {
 	NSOpenGLView* openGLView = [NSClassFromString(@"EAGLView") sharedEGLView];
 	NSOpenGLContext* glContext = [openGLView openGLContext];
+
+	[glContext makeCurrentContext];
+	CGLLockContext([glContext CGLContextObj]);
+
+	[self performSelector:sel withObject:event];
+
+	CGLUnlockContext([glContext CGLContextObj]);
+}
+
+void wrapOpenGLContext2(id self, SEL sel, NSEvent* event) {
+	NSOpenGLView* openGLView = [NSClassFromString(@"EAGLView") sharedEGLView];
+	NSOpenGLContext* glContext = [openGLView openGLContext];
+
+	// CCTime::gettimeofdayCocos2d(&FPSBypass::get()->before, nullptr);
+	// FPSBypass::get()->check = true;
 
 	[glContext makeCurrentContext];
 	CGLLockContext([glContext CGLContextObj]);

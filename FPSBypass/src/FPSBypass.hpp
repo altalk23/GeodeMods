@@ -13,6 +13,9 @@ namespace tulip::fps {
 		bool vsync;
 		double updateInterval;
 
+		cocos2d::cc_timeval before;
+		bool check = false;
+
 		static FPSBypass* get();
 
 		FPSBypass();

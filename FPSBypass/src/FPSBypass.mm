@@ -80,6 +80,17 @@ void FPSBypass::displayLoop(bool paused) {
 	CCDirector::sharedDirector()->drawScene();
 	cocos2d::CCDirector::sharedDirector()->setPaused(false);
 
+	// if (!paused && check) {
+	// 	struct cc_timeval after;
+	// 	CCTime::gettimeofdayCocos2d(&after, nullptr);
+
+	// 	auto delta = (after.tv_sec - before.tv_sec) + (after.tv_usec - before.tv_usec) / 1000000.0;
+
+	// 	log::debug("difference {}", delta);
+
+	// 	check = false;
+	// }
+
 	CCPoolManager::sharedPoolManager()->pop();
 
 	[glContext flushBuffer];
