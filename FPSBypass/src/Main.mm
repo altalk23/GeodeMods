@@ -8,11 +8,15 @@
 using namespace geode::prelude;
 using namespace tulip::fps;
 
+struct CCDirectorTest : public CCDirector {
+	void aa() {
+		m_dAnimationInterval = FPSBypass::get()->updateInterval;
+	}
+};
+
 void setAnimationInterval(CCDirectorCaller* self, SEL sel, double interval) {
 	if (interval == 0.25) {
-		return CCDirector::get()->setAnimationInterval(
-			1.0 / Mod::get()->getSettingValue<double>("fps")
-		);
+		static_cast<CCDirectorTest*>(CCDirector::get())->aa();
 	}
 	FPSBypass::get()->setAnimationInterval(interval);
 }
