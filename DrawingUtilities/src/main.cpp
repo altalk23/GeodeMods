@@ -14,7 +14,7 @@ struct LineButton : Modify<LineButton, EditorUI> {
 	CCMenuItemSpriteExtra* button;
 
 	CCPoint getPos(CCTouch* touch) {
-		return m_editorLayer->m_objectLayer->convertToNodeSpace(
+		return LevelEditorLayer::get()->m_objectLayer->convertToNodeSpace(
 			this->convertToWorldSpace(CCDirector::get()->convertToGL(touch->getLocationInView()))
 		);
 	}

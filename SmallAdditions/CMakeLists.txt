@@ -15,7 +15,9 @@ set_source_files_properties(${OBJC_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS O
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${OBJC_SOURCES})
 
-target_link_libraries(${PROJECT_NAME} "-framework Cocoa" "-framework OpenGL")
+if (APPLE)
+	target_link_libraries(${PROJECT_NAME} "-framework Cocoa" "-framework OpenGL")
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	include

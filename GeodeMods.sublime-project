@@ -79,28 +79,34 @@
 					"name": "SmallAdditions_PACKAGE",
 				},
 				{
-					"build_target": "fmt",
+					/*"build_target": "fmt",*/
 					"name": "fmt",
+					/*"target": "ctest_run",*/
+					"build_target": "fmt",
 				},
+/*{
+					"name": "nanosvg",
+					/*"target": "ctest_run"* /
+					"build_target": "nanosvg",
+				},*/
 				{
 					"build_target": "mat-json",
 					"name": "mat-json",
 				},
 				{
-					"name": "nanosvg",
-					/*"target": "ctest_run"*/
 					"build_target": "nanosvg",
+					"name": "nanosvg",
 				},
 				{
 					"build_target": "nanosvgrast",
-					"name": "nanosvgrast"
+					"name": "nanosvgrast",
 				},
 				{
 					"name": "ctest",
-					"target": "ctest_run"
+					"target": "ctest_run",
 				},
 			],
-			"working_dir": "${project_path}/build/release",
+			"working_dir": "${project_path}/build/debug",
 		},
 	],
 	"folders":
@@ -117,13 +123,14 @@
 		"cmake":
 		{
 			"generator": "Ninja",
-			"build_folder": "${project_path}/build/release",
+			"build_folder": "${project_path}/build/debug",
 			"command_line_overrides":
             {
                 "CMAKE_C_COMPILER": "/usr/local/opt/llvm/bin/clang",
 	            "CMAKE_CXX_COMPILER": "/usr/local/opt/llvm/bin/clang++",
 	            "CMAKE_C_COMPILER_LAUNCHER": "/usr/local/bin/ccache",
 	            "CMAKE_CXX_COMPILER_LAUNCHER": "/usr/local/bin/ccache",
+	            "CMAKE_BUILD_TYPE": "Debug",
 
 	            // "CMAKE_TOOLCHAIN_FILE": "/Applications/AndroidNDK.app/Contents/NDK/build/cmake/android.toolchain.cmake",
 	            // "ANDROID_ABI": "armeabi-v7a",

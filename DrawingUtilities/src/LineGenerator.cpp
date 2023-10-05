@@ -5,7 +5,6 @@
 using namespace geode::prelude;
 using namespace tulip::editor;
 #include <array>
-#include <numbers>
 
 float LineGenerator::getRotation(CCPoint const& begin, CCPoint const& end) {
 	auto rotation = -(end - begin).getAngle();
@@ -59,7 +58,8 @@ std::vector<ObjectData> LineGenerator::generate(
 	if (width > length) {
 		std::swap(length, width);
 		auto mid = begin.lerp(end, 0.5);
-		auto out = CCPoint::forAngle((end - begin).getAngle() + std::numbers::pi / 2) * length / 2;
+		auto out =
+			CCPoint::forAngle((end - begin).getAngle() + agg::curve4_div::pi / 2) * length / 2;
 		begin = mid + out;
 		end = mid - out;
 	}
@@ -122,7 +122,7 @@ void LineGenerator::addUnits(std::vector<ObjectData>& objects, float units, floa
 void LineGenerator::rotate(std::vector<ObjectData>& objects, float rotation) {
 	for (auto& obj : objects) {
 		obj.position = obj.position.rotateByAngle({ 0, 0 }, -rotation);
-		obj.rotation = rotation / std::numbers::pi * 180;
+		obj.rotation = rotation / agg::curve4_div::pi * 180;
 	}
 }
 
@@ -245,7 +245,7 @@ std::vector<ObjectData> BezierLineGenerator::generate(
 			auto a3 = generator.m_points[i + 1];
 
 			if (a1 != a2) {
-				if (std::abs(BezierFill::angle(a1, a2, a3)) >= std::numbers::pi * 0.75) {
+				if (std::abs(BezierFill::angle(a1, a2, a3)) >= agg::curve4_div::pi * 0.75) {
 					begin = BezierFill::extend(a1, a2, a3, width).first;
 				}
 				else {}
@@ -262,7 +262,7 @@ std::vector<ObjectData> BezierLineGenerator::generate(
 				continue;
 			}
 
-			if (std::abs(BezierFill::angle(a2, a3, a4)) >= std::numbers::pi * 0.75) {
+			if (std::abs(BezierFill::angle(a2, a3, a4)) >= agg::curve4_div::pi * 0.75) {
 				end = BezierFill::extend(a2, a3, a4, width).second;
 			}
 			else {

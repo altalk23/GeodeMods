@@ -86,8 +86,8 @@ void LineDrawer::svgTest() {
 	}
 
 	for (auto obj : CCArrayExt<GameObject*>(m_lineObjects)) {
-		m_editor->m_editorLayer->addToSection(obj);
-		m_editor->m_editorLayer->addSpecial(obj);
+		LevelEditorLayer::get()->addToSection(obj);
+		LevelEditorLayer::get()->addSpecial(obj);
 	}
 	this->clearObjects();
 
@@ -224,8 +224,8 @@ void LineDrawer::ended(cocos2d::CCPoint pos) {
 	this->generateLine();
 
 	for (auto obj : CCArrayExt<GameObject*>(m_lineObjects)) {
-		m_editor->m_editorLayer->addToSection(obj);
-		m_editor->m_editorLayer->addSpecial(obj);
+		LevelEditorLayer::get()->addToSection(obj);
+		LevelEditorLayer::get()->addSpecial(obj);
 	}
 	this->clearObjects();
 	++m_linkID;
@@ -247,8 +247,8 @@ LineDrawer::LineDrawer() {
 void LineDrawer::setEditor(EditorUI* editor) {
 	m_editor = editor;
 	m_drawLayer = CCDrawNode::create();
-	m_editor->m_editorLayer->m_objectLayer->addChild(m_lineLayer);
-	m_editor->m_editorLayer->m_objectLayer->addChild(m_drawLayer, 100);
+	LevelEditorLayer::get()->m_objectLayer->addChild(m_lineLayer);
+	LevelEditorLayer::get()->m_objectLayer->addChild(m_drawLayer, 100);
 
 	// auto test = CCSprite::create("test.png"_spr);
 	// test->setOpacity(63);

@@ -61,6 +61,18 @@ void wrapOpenGLContext(id self, SEL sel, NSEvent* event) {
 	CGLUnlockContext([glContext CGLContextObj]);
 }
 
+void wrapOpenGLContextEmpty(id self, SEL sel) {
+	NSOpenGLView* openGLView = [NSClassFromString(@"EAGLView") sharedEGLView];
+	NSOpenGLContext* glContext = [openGLView openGLContext];
+
+	[glContext makeCurrentContext];
+	CGLLockContext([glContext CGLContextObj]);
+
+	[self performSelector:sel];
+
+	CGLUnlockContext([glContext CGLContextObj]);
+}
+
 void wrapOpenGLContext2(id self, SEL sel, NSEvent* event) {
 	NSOpenGLView* openGLView = [NSClassFromString(@"EAGLView") sharedEGLView];
 	NSOpenGLContext* glContext = [openGLView openGLContext];
@@ -115,6 +127,11 @@ static auto vsyncEvent = listenForSettingChanges(
 $on_mod(Loaded) {
 	createHook("AppController", "windowShouldClose:", &wrapOpenGLContextDestroy<bool>);
 	createHook("AppController", "applicationShouldTerminate:", &wrapOpenGLContextDestroy<NSApplicationTerminateReply>);
+
+	createHook("AppController", "applicationWillEnterForeground", &wrapOpenGLContextEmpty);
+	createHook("AppController", "applicationDidEnterBackground", &wrapOpenGLContextEmpty);
+	createHook("AppController", "applicationWillBecomeActive", &wrapOpenGLContextEmpty);
+	createHook("AppController", "applicationWillResignActive", &wrapOpenGLContextEmpty);
 
 	createHook("CCDirectorCaller", "setAnimationInterval:", &setAnimationInterval);
 	createHook("CCDirectorCaller", "startMainLoop", &startMainLoop);

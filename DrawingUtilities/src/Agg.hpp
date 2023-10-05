@@ -25,7 +25,6 @@
 //----------------------------------------------------------------------------
 
 #include <cocos2d.h>
-#include <numbers>
 #include <vector>
 
 namespace agg {
@@ -35,7 +34,7 @@ namespace agg {
 	}
 
 	struct curve4_div {
-		static inline constexpr auto pi = std::numbers::pi;
+		static inline constexpr auto pi = 3.14159265358979323846;
 		static inline constexpr double curve_distance_epsilon = 1e-30;
 		static inline constexpr double curve_collinearity_epsilon = 1e-30;
 		static inline constexpr double curve_angle_tolerance_epsilon = 0.01;

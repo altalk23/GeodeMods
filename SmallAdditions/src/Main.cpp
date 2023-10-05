@@ -17,7 +17,9 @@ void tulip::dandelion::registerDisable(std::function<void()> func) {
 }
 
 $execute {
+#ifdef GEODE_IS_MACOS
 	auto res = Mod::get()->patch(reinterpret_cast<void*>(base::get() + 0x3aa9d8), { 0x00 });
+#endif
 }
 
 $on_mod(Enabled) {
